@@ -1,0 +1,17 @@
+{
+	"name": "binary-view",
+	"version": "0.0.0",
+	"scripts": {},
+	"dependencies": {
+		"@vscode/webview-ui-toolkit": "0.8.4",
+		"lit": "2.0.2"
+	},
+	"devDependencies": {
+		"clean-css": "5.2.2",
+		"postcss-preset-env": "7.0.1",
+		"rollup-plugin-copy": "3.4.0",
+		"rollup-plugin-minify-html-literals": "1.2.6",
+		"rollup-plugin-inline-postcss": "3.0.1",
+		"vite": "2.6.14"
+	}
+}
