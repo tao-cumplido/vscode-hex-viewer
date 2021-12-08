@@ -12,7 +12,7 @@ const error = {
 	},
 };
 
-export const decoder: Decoder = (data) => {
+const decoder: Decoder = (data) => {
 	const decoded = [];
 
 	let offset = 0;
@@ -100,3 +100,5 @@ export const decoder: Decoder = (data) => {
 
 	return decoded;
 };
+
+export default decoder;

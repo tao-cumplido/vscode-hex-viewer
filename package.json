@@ -28,7 +28,21 @@
 				],
 				"priority": "option"
 			}
-		]
+		],
+		"commands": [
+			{
+				"command": "hexViewer.selectDecoder",
+				"title": "Hex Viewer: Select Decoder"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "hexViewer.selectDecoder",
+					"when": "hexViewer:openEditor"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
