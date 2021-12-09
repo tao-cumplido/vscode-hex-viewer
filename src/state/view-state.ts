@@ -2,17 +2,29 @@ import type { Webview } from 'vscode';
 
 import type { BinaryDocument } from '../binary-document';
 import type { Decoder } from '../decoders/type';
+import { builtinDecoders } from '../decoders';
 
 export class ViewState {
 	private firstRun = true;
-	private decoder?: Decoder;
+	private decoder: Decoder;
 
 	readonly webview: Webview;
 	readonly document: BinaryDocument;
 
+	get decoderName(): string {
+		const entry = Object.entries(builtinDecoders).find(([_, decoder]) => decoder === this.decoder);
+
+		if (!entry) {
+			throw new Error(`unexpected missing decoder name lookup`);
+		}
+
+		return entry[0];
+	}
+
 	constructor(webview: Webview, document: BinaryDocument, decoder: Decoder) {
 		this.webview = webview;
 		this.document = document;
+		this.decoder = decoder;
 
 		webview.onDidReceiveMessage(async (message) => {
 			if (message === 'ready') {
@@ -21,11 +33,9 @@ export class ViewState {
 
 				await webview.postMessage({ type: 'bytes', data: bytes });
 
-				if (this.firstRun) {
-					await this.useDecoder(decoder);
-				} else if (this.decoder) {
-					await this.useDecoder(this.decoder);
-				}
+				await this.useDecoder(this.decoder);
+
+				this.firstRun = false;
 			}
 		});
 	}
@@ -35,7 +45,6 @@ export class ViewState {
 			await this.webview.postMessage({ type: 'decoded', data: null });
 		}
 
-		this.firstRun = false;
 		this.decoder = decoder;
 
 		await this.webview.postMessage({ type: 'decoded', data: decoder(this.document.data) });

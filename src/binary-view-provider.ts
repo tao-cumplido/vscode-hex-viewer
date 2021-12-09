@@ -62,11 +62,20 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 			} else {
 				state.activeView = null;
 			}
+
+			if (state.activeView) {
+				state.activeDecoderStatusItem.text = state.activeView.decoderName;
+				state.activeDecoderStatusItem.show();
+			} else {
+				state.activeDecoderStatusItem.hide();
+			}
 		});
 
 		const viewState = new ViewState(webviewPanel.webview, document, defaultDecoder);
 
 		state.activeView = viewState;
+		state.activeDecoderStatusItem.text = viewState.decoderName;
+		state.activeDecoderStatusItem.show();
 		viewStates.set(webviewPanel.webview, viewState);
 	}
 }
