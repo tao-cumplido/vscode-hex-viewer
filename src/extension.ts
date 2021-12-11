@@ -96,7 +96,7 @@ function reloadDecoders() {
 export function activate(context: ExtensionContext): void {
 	state.decoderItems = [...builtinDecoders, ...resolveCustomDecoders()];
 
-	state.activeDecoderStatusItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
+	state.activeDecoderStatusItem = window.createStatusBarItem(StatusBarAlignment.Right, 0);
 
 	state.activeDecoderStatusItem.command = 'hexViewer.selectDecoder';
 	state.activeDecoderStatusItem.tooltip = 'Select decoder';

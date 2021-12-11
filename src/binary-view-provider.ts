@@ -57,7 +57,7 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 		`;
 
 		webviewPanel.onDidChangeViewState(() => {
-			if (webviewPanel.visible) {
+			if (webviewPanel.active) {
 				state.activeView = viewStates.get(webviewPanel.webview) ?? null;
 			} else {
 				state.activeView = null;
