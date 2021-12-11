@@ -24,7 +24,7 @@ export class BinaryDocument implements CustomDocument {
 
 			if (!isDecoderResult(result)) {
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				window.showErrorMessage(`Hex Viewer: Invalid decoder result.`);
+				window.showErrorMessage(`Invalid decoder result.`);
 				return null;
 			}
 
@@ -45,7 +45,7 @@ export class BinaryDocument implements CustomDocument {
 			return result;
 		} catch (error) {
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			window.showErrorMessage(`Hex Viewer: Error while decoding data. See output for details.`);
+			window.showErrorMessage(`Error while decoding data. See output for details.`);
 			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 			output.appendLine(`${error}\n`);
 			return null;

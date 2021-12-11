@@ -21,33 +21,39 @@ const vm = new NodeVM({
 const customDecoderWatchers = new Set<fs.FSWatcher>();
 
 function resolveCustomDecoders() {
-	const root = state.activeView
-		? workspace.getWorkspaceFolder(state.activeView.document.uri)
-		: workspace.workspaceFolders?.[0];
-
-	if (!root) {
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		window.showWarningMessage(`Hex Viewer: Couldn't resolve workspace root for custom decoders.`);
-		return [];
-	}
-
-	if (root.uri.scheme !== 'file') {
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		window.showWarningMessage(`Hex Viewer: Custom decoders are not supported in virtual workspaces.`);
-		return [];
-	}
-
 	const customDecodersConfiguration = workspace
 		.getConfiguration('hexViewer')
 		.get<Record<string, string>>('customDecoders');
 
 	if (!customDecodersConfiguration) {
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		window.showWarningMessage(`Hex Viewer: Couldn't read custom decoders configuration.`);
+		window.showErrorMessage(`Couldn't read custom decoders configuration.`);
 		return [];
 	}
 
-	return Object.entries(customDecodersConfiguration).reduce<DecoderItem[]>((result, [label, file]) => {
+	const entries = Object.entries(customDecodersConfiguration);
+
+	if (!entries.length) {
+		return [];
+	}
+
+	const root = state.activeView
+		? workspace.getWorkspaceFolder(state.activeView.document.uri)
+		: workspace.workspaceFolders?.[0];
+
+	if (!root) {
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
+		window.showErrorMessage(`Couldn't resolve workspace root for custom decoders.`);
+		return [];
+	}
+
+	if (root.uri.scheme !== 'file') {
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
+		window.showWarningMessage(`Custom decoders are not supported in virtual workspaces.`);
+		return [];
+	}
+
+	return entries.reduce<DecoderItem[]>((result, [label, file]) => {
 		try {
 			const destinationPath = path.isAbsolute(file) ? file : path.resolve(root.uri.fsPath, file);
 
@@ -78,7 +84,7 @@ function resolveCustomDecoders() {
 			});
 		} catch (error) {
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			window.showErrorMessage(`Hex Viewer: Error resolving custom decoder '${label}'. See output for details.`);
+			window.showErrorMessage(`Error resolving custom decoder '${label}'. See output for details.`);
 			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 			output.appendLine(`${error}\n`);
 		}
