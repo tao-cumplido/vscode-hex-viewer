@@ -1,27 +1,29 @@
 import type { Webview } from 'vscode';
 
 import type { BinaryDocument } from '../binary-document';
-import type { Decoder } from '../decoders/type';
-import { builtinDecoders } from '../decoders';
+import type { PotentialDecoder } from '../decoders';
+import { defaultDecoder } from '../decoders';
+import { state } from './index';
 
 export class ViewState {
 	private firstRun = true;
-	private decoder: Decoder;
+	private decoder: PotentialDecoder;
 
 	readonly webview: Webview;
 	readonly document: BinaryDocument;
 
 	get decoderName(): string {
-		const entry = Object.entries(builtinDecoders).find(([_, decoder]) => decoder === this.decoder);
+		const item = state.decoderItems.find(({ decoder }) => decoder === this.decoder);
 
-		if (!entry) {
-			throw new Error(`unexpected missing decoder name lookup`);
+		if (!item) {
+			this.useDecoder(defaultDecoder.decoder).catch(console.error);
+			return defaultDecoder.label;
 		}
 
-		return entry[0];
+		return item.label;
 	}
 
-	constructor(webview: Webview, document: BinaryDocument, decoder: Decoder) {
+	constructor(webview: Webview, document: BinaryDocument, decoder: PotentialDecoder) {
 		this.webview = webview;
 		this.document = document;
 		this.decoder = decoder;
@@ -40,13 +42,18 @@ export class ViewState {
 		});
 	}
 
-	async useDecoder(decoder: Decoder): Promise<void> {
+	async useDecoder(decoder: PotentialDecoder): Promise<void> {
 		if (!this.firstRun) {
 			await this.webview.postMessage({ type: 'decoded', data: null });
 		}
 
 		this.decoder = decoder;
 
-		await this.webview.postMessage({ type: 'decoded', data: decoder(this.document.data) });
+		const data = this.document.decodeWith(decoder);
+
+		await this.webview.postMessage({
+			type: 'decoded',
+			data: data ?? Array.from<null>({ length: this.document.data.length }).fill(null),
+		});
 	}
 }

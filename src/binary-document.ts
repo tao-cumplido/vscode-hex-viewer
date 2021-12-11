@@ -1,7 +1,9 @@
 import type { CustomDocument, Uri } from 'vscode';
-import { workspace } from 'vscode';
+import { window, workspace } from 'vscode';
 
-import type { Decoder } from './decoders/type';
+import type { DecoderResult, PotentialDecoder } from './decoders';
+import { isDecoderResult } from './decoders';
+import { output } from './output';
 
 export class BinaryDocument implements CustomDocument {
 	static async create(uri: Uri): Promise<BinaryDocument> {
@@ -16,23 +18,38 @@ export class BinaryDocument implements CustomDocument {
 		this.data = data;
 	}
 
-	decodeWith(decoder: Decoder): ReturnType<Decoder> {
-		const result = decoder(this.data);
-		const byteLength = result.reduce((n, value) => {
-			if (typeof value === 'string' || value === null) {
-				return n + 1;
+	decodeWith(decoder: PotentialDecoder): DecoderResult | null {
+		try {
+			const result: unknown = decoder(this.data);
+
+			if (!isDecoderResult(result)) {
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
+				window.showErrorMessage(`Hex Viewer: Invalid decoder result.`);
+				return null;
 			}
 
-			return n + (value.length ?? 1);
-		}, 0);
+			const byteLength = result.reduce((n, value) => {
+				if (typeof value === 'string' || value === null) {
+					return n + 1;
+				}
 
-		if (byteLength > this.data.length) {
-			return Array.from<null>({ length: this.data.length }).fill(null);
+				return n + (value.length ?? 1);
+			}, 0);
+
+			if (byteLength > this.data.length) {
+				return null;
+			}
+
+			result.push(...Array.from<null>({ length: this.data.length - byteLength }).fill(null));
+
+			return result;
+		} catch (error) {
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
+			window.showErrorMessage(`Hex Viewer: Error while decoding data. See output for details.`);
+			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+			output.appendLine(`${error}\n`);
+			return null;
 		}
-
-		result.push(...Array.from<null>({ length: this.data.length - byteLength }).fill(null));
-
-		return result;
 	}
 
 	async openCustomDocument(uri: Uri) {

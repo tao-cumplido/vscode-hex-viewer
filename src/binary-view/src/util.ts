@@ -20,7 +20,7 @@ export const cellStyles = css`
 	}
 
 	:host([highlight='on']) > span {
-		background: var(--vscode-editor-inactiveSelectionBackground);
+		background: var(--vscode-editor-wordHighlightStrongBackground);
 	}
 
 	:host([highlight='weak']) > span {

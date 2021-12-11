@@ -1,11 +1,15 @@
 import type { StatusBarItem } from 'vscode';
 import { commands } from 'vscode';
 
+import type { DecoderItem } from '../decoders';
 import type { ViewState } from '../state';
+import { builtinDecoders } from '../decoders';
 
 export class ExtensionState {
 	#activeView: ViewState | null = null;
 	#activeDecoderStatusItem?: StatusBarItem;
+
+	decoderItems: DecoderItem[] = builtinDecoders;
 
 	get activeView(): ViewState | null {
 		return this.#activeView;

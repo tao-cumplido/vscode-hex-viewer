@@ -71,7 +71,7 @@ module.exports = {
 		'no-console': ['error', { allow: ['warn', 'error'] }],
 		'no-delete-var': 'error',
 		'no-else-return': ['error', { allowElseIf: false }],
-		'no-empty': 'error',
+		'no-empty': ['error', { allowEmptyCatch: true }],
 		'no-eval': 'error',
 		'no-extend-native': 'error',
 		'no-extra-boolean-cast': ['error', { enforceForLogicalOperands: true }],
