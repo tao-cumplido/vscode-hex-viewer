@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 
 import type { ExtensionContext } from 'vscode';
-import { NodeVM } from 'vm2';
 import { commands, window, workspace, StatusBarAlignment } from 'vscode';
 
 import type { DecoderItem } from './decoders';
@@ -10,13 +9,6 @@ import { BinaryViewProvider } from './binary-view-provider';
 import { builtinDecoders, defaultDecoder } from './decoders';
 import { output } from './output';
 import { state } from './state';
-
-const vm = new NodeVM({
-	eval: false,
-	wasm: false,
-	// @ts-expect-error
-	strict: true,
-});
 
 const customDecoderWatchers = new Set<fs.FSWatcher>();
 
@@ -72,7 +64,8 @@ function resolveCustomDecoders() {
 
 			customDecoderWatchers.add(currentWatcher);
 
-			const decoder: unknown = vm.runFile(destinationPath);
+			// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+			const decoder: unknown = require(destinationPath);
 
 			if (typeof decoder !== 'function') {
 				throw new TypeError(`Custom decoder '${label}' is not a function`);
