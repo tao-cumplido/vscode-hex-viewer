@@ -65,7 +65,7 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./tsconfig.src.json",
+		"compile": "tsc -p ./tsconfig.src.json && npm run -w binary-view build",
 		"watch:extension": "tsc -watch -p ./tsconfig.src.json",
 		"watch:webview": "npm run -w binary-view watch",
 		"pretest": "npm run compile && tsc -p ./tsconfig.test.json && npm run lint",
@@ -91,6 +91,7 @@
 		"mocha": "9.1.3",
 		"prettier": "2.4.1",
 		"prettier-plugin-sh": "0.7.1",
-		"typescript": "4.4.4"
+		"typescript": "4.4.4",
+		"vsce": "2.5.1"
 	}
 }
