@@ -25,7 +25,8 @@
 					"additionalProperties": {
 						"type": "string"
 					},
-					"default": {}
+					"default": {},
+					"description": "Map of custom decoders. Keys are decoder names and values are the path to the JS file. Relative paths are resolved from the workspace root."
 				}
 			}
 		},
