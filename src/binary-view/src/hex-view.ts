@@ -25,16 +25,17 @@ type HostMessage = DataMessage<'bytes', ArrayBuffer> | DataMessage<'decoded', Ar
 export class HexView extends LitElement {
 	static override styles = css`
 		:host {
+			--vscode-scrollbar-size: 10px;
 			font-family: var(--vscode-editor-font-family);
 			user-select: none;
-			min-height: 100vh;
+			min-height: calc(100vh - var(--vscode-scrollbar-size));
 			display: grid;
 		}
 
 		.decoded-spinner {
 			grid-column: decode 1 / span 16;
 			& > div {
-				height: calc(100vh - 1.6rem);
+				height: calc(100vh - var(--vscode-scrollbar-size) - 1.6rem);
 				display: grid;
 				position: sticky;
 				top: 1.6rem;
@@ -46,7 +47,7 @@ export class HexView extends LitElement {
 		}
 
 		.data-view {
-			width: min-content;
+			place-self: start;
 			display: grid;
 			grid: auto / [offset] auto 0.3rem repeat(16, [byte] auto) 1rem repeat(16, [decode] auto) [end];
 		}
