@@ -4,6 +4,7 @@ import { window, workspace } from 'vscode';
 import type { DecoderResult, PotentialDecoder } from './decoders';
 import { isDecoderResult } from './decoders';
 import { output } from './output';
+import { state } from './state';
 
 export class BinaryDocument implements CustomDocument {
 	static async create(uri: Uri): Promise<BinaryDocument> {
@@ -57,6 +58,9 @@ export class BinaryDocument implements CustomDocument {
 	}
 
 	dispose() {
-		// nothing to dispose yet
+		if (state.activeView?.document === this) {
+			state.activeDecoderStatusItem.hide();
+			state.activeView = null;
+		}
 	}
 }
