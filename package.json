@@ -25,6 +25,7 @@
 		"onCustomEditor:hexViewer.binary"
 	],
 	"main": "./dist/src/extension.js",
+	"publisher": "tao-cumplido",
 	"contributes": {
 		"configuration": {
 			"title": "Hex Viewer",
