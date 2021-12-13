@@ -83,6 +83,7 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"dependencies": {
+		"@vscode/webview-ui-toolkit": "0.8.4",
 		"ajv": "8.8.2"
 	},
 	"devDependencies": {

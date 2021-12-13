@@ -6,7 +6,6 @@
 		"watch": "vite build --watch --sourcemap --mode development"
 	},
 	"dependencies": {
-		"@vscode/webview-ui-toolkit": "0.8.4",
 		"lit": "2.0.2"
 	},
 	"devDependencies": {
