@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="500"
+   height="500"
+   viewBox="0 0 500 500"
+   version="1.1"
+   id="svg2254"
+   inkscape:version="1.0.2-2 (e86c870879, 2021-01-15)"
+   sodipodi:docname="logo.svg">
+  <defs
+     id="defs2248" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="-795.37083"
+     inkscape:cy="8.5702157"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     units="px"
+     showguides="false"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="3840"
+     inkscape:window-height="2066"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1">
+    <sodipodi:guide
+       position="250,250"
+       orientation="0,1"
+       id="guide848"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="250,250"
+       orientation="-1,0"
+       id="guide850"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata2251">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       sodipodi:type="star"
+       style="fill:#008080;stroke:none;stroke-width:1.3726;stroke-linecap:square;stroke-linejoin:round"
+       id="path830"
+       sodipodi:sides="6"
+       sodipodi:cx="250.00002"
+       sodipodi:cy="250.00002"
+       sodipodi:r1="258.81906"
+       sodipodi:r2="253.84589"
+       sodipodi:arg1="0.78539816"
+       sodipodi:arg2="1.3089969"
+       inkscape:flatsided="true"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 433.01273,433.01273 183.01271,500.00003 -1.3919086e-7,316.98732 66.987301,66.987303 316.98732,-5.9436272e-7 500.00003,183.01271 Z" />
+    <text
+       xml:space="preserve"
+       x="66.315987"
+       y="221.67775"
+       id="text834"><tspan
+         sodipodi:role="line"
+         x="66.315987"
+         y="221.67775"
+         id="tspan836"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:92px;font-family:'Sarasa Mono J';-inkscape-font-specification:'Sarasa Mono J Bold';fill:#ffffff">e5 8d 81</tspan><tspan
+         sodipodi:role="line"
+         x="66.315987"
+         y="345.73056"
+         id="tspan838"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:92px;font-family:'Sarasa Mono J';-inkscape-font-specification:'Sarasa Mono J Bold';fill:#ffffff">e5 85 ad</tspan></text>
+  </g>
+</svg>

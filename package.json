@@ -1,8 +1,8 @@
 {
 	"name": "hex-viewer",
-	"displayName": "hex-viewer",
-	"description": "",
-	"version": "0.0.1",
+	"displayName": "Hex Viewer",
+	"description": "View files in byte representation with multiple decoding options.",
+	"version": "0.1.0",
 	"workspaces": [
 		"src/binary-view"
 	],
@@ -12,6 +12,15 @@
 	"categories": [
 		"Other"
 	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tao-cumplido/vscode-hex-viewer"
+	},
+	"bugs": {
+		"url": "https://github.com/tao-cumplido/vscode-hex-viewer/issues"
+	},
+	"license": "MIT",
+	"icon": "logo.png",
 	"activationEvents": [
 		"onCustomEditor:hexViewer.binary"
 	],
