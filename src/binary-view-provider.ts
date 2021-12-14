@@ -2,7 +2,7 @@ import type { CustomReadonlyEditorProvider, Disposable, ExtensionContext, Webvie
 import { window, Uri } from 'vscode';
 
 import { BinaryDocument } from './binary-document';
-import defaultDecoder from './decoders/iso-8859-1';
+import { defaultDecoder } from './decoders';
 import { state, ViewState } from './state';
 
 const viewStates = new WeakMap<Webview, ViewState>();
@@ -57,14 +57,24 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 		`;
 
 		webviewPanel.onDidChangeViewState(() => {
-			if (webviewPanel.active) {
-				state.activeView = viewStates.get(webviewPanel.webview) ?? null;
+			const currentView = viewStates.get(webviewPanel.webview);
+
+			if (webviewPanel.active && currentView) {
+				state.activeView = currentView;
 			} else {
 				state.activeView = null;
 			}
 
+			if (currentView) {
+				if (webviewPanel.visible) {
+					state.visibleViews.add(currentView);
+				} else {
+					state.visibleViews.delete(currentView);
+				}
+			}
+
 			if (state.activeView) {
-				state.activeDecoderStatusItem.text = state.activeView.decoderName;
+				state.activeDecoderStatusItem.text = state.activeView.decoderItem.label;
 				state.activeDecoderStatusItem.show();
 			} else {
 				state.activeDecoderStatusItem.hide();
@@ -73,8 +83,9 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 
 		const viewState = new ViewState(webviewPanel.webview, document, defaultDecoder);
 
+		state.allViews.add(viewState);
 		state.activeView = viewState;
-		state.activeDecoderStatusItem.text = viewState.decoderName;
+		state.activeDecoderStatusItem.text = viewState.decoderItem.label;
 		state.activeDecoderStatusItem.show();
 		viewStates.set(webviewPanel.webview, viewState);
 	}

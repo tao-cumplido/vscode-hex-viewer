@@ -11,6 +11,9 @@ export class ExtensionState {
 
 	decoderItems: DecoderItem[] = builtinDecoders;
 
+	readonly allViews = new Set<ViewState>();
+	readonly visibleViews = new Set<ViewState>();
+
 	get activeView(): ViewState | null {
 		return this.#activeView;
 	}

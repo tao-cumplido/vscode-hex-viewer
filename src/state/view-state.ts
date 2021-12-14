@@ -1,32 +1,20 @@
 import type { Webview } from 'vscode';
 
 import type { BinaryDocument } from '../binary-document';
-import type { PotentialDecoder } from '../decoders';
-import { defaultDecoder } from '../decoders';
-import { state } from './index';
+import type { DecoderItem } from '../decoders';
 
 export class ViewState {
 	private firstRun = true;
-	private decoder: PotentialDecoder;
 
 	readonly webview: Webview;
 	readonly document: BinaryDocument;
 
-	get decoderName(): string {
-		const item = state.decoderItems.find(({ decoder }) => decoder === this.decoder);
+	decoderItem: DecoderItem;
 
-		if (!item) {
-			this.useDecoder(defaultDecoder.decoder).catch(console.error);
-			return defaultDecoder.label;
-		}
-
-		return item.label;
-	}
-
-	constructor(webview: Webview, document: BinaryDocument, decoder: PotentialDecoder) {
+	constructor(webview: Webview, document: BinaryDocument, decoderItem: DecoderItem) {
 		this.webview = webview;
 		this.document = document;
-		this.decoder = decoder;
+		this.decoderItem = decoderItem;
 
 		webview.onDidReceiveMessage(async (message) => {
 			if (message === 'ready') {
@@ -35,21 +23,19 @@ export class ViewState {
 
 				await webview.postMessage({ type: 'bytes', data: bytes });
 
-				await this.useDecoder(this.decoder);
+				await this.updateDecodedData();
 
 				this.firstRun = false;
 			}
 		});
 	}
 
-	async useDecoder(decoder: PotentialDecoder): Promise<void> {
+	async updateDecodedData(): Promise<void> {
 		if (!this.firstRun) {
 			await this.webview.postMessage({ type: 'decoded', data: null });
 		}
 
-		this.decoder = decoder;
-
-		const data = this.document.decodeWith(decoder);
+		const data = this.document.decodeWith(this.decoderItem.decoder);
 
 		await this.webview.postMessage({
 			type: 'decoded',

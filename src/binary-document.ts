@@ -59,8 +59,15 @@ export class BinaryDocument implements CustomDocument {
 
 	dispose() {
 		if (state.activeView?.document === this) {
+			state.visibleViews.delete(state.activeView);
 			state.activeDecoderStatusItem.hide();
 			state.activeView = null;
+		}
+
+		const thisView = [...state.allViews].find(({ document }) => document === this);
+
+		if (thisView) {
+			state.allViews.delete(thisView);
 		}
 	}
 }

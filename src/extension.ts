@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import type { ExtensionContext } from 'vscode';
+import clearModule from 'clear-module';
 import { commands, window, workspace, StatusBarAlignment } from 'vscode';
 
 import type { DecoderItem } from './decoders';
@@ -58,11 +59,13 @@ function resolveCustomDecoders() {
 					customDecoderWatchers.clear();
 
 					// eslint-disable-next-line @typescript-eslint/no-use-before-define
-					return reloadDecoders();
+					reloadDecoders();
 				}
 			});
 
 			customDecoderWatchers.add(currentWatcher);
+
+			clearModule(destinationPath);
 
 			// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 			const decoder: unknown = require(destinationPath);
@@ -88,8 +91,15 @@ function resolveCustomDecoders() {
 
 function reloadDecoders() {
 	state.decoderItems = [...builtinDecoders, ...resolveCustomDecoders()];
-	const activeDecoder = state.decoderItems.find((item) => item.label === state.activeDecoderStatusItem.text);
-	return state.activeView?.useDecoder(activeDecoder?.decoder ?? defaultDecoder.decoder);
+	// const activeDecoder = state.decoderItems.find((item) => item.label === state.activeDecoderStatusItem.text);
+	state.allViews.forEach((view) => {
+		const item = state.decoderItems.find(({ label }) => label === view.decoderItem.label);
+		view.decoderItem = item ?? defaultDecoder;
+	});
+	state.visibleViews.forEach((view) => {
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
+		view.updateDecodedData();
+	});
 }
 
 export function activate(context: ExtensionContext): void {
@@ -105,7 +115,7 @@ export function activate(context: ExtensionContext): void {
 	context.subscriptions.push(
 		workspace.onDidChangeConfiguration((event) => {
 			if (event.affectsConfiguration('hexViewer')) {
-				return reloadDecoders();
+				reloadDecoders();
 			}
 		}),
 	);
@@ -116,7 +126,8 @@ export function activate(context: ExtensionContext): void {
 
 			if (item && state.activeView) {
 				state.activeDecoderStatusItem.text = item.label;
-				await state.activeView.useDecoder(item.decoder);
+				state.activeView.decoderItem = item;
+				await state.activeView.updateDecodedData();
 			}
 		}),
 	);
