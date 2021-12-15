@@ -16,6 +16,8 @@ export interface RelationData {
 export class DataCell extends LitElement implements Highlightable {
 	static override styles = [cellStyles];
 
+	private readonly listeners = new Map<string, () => unknown>();
+
 	private relatedStrong: Set<Highlightable> = new Set();
 	private relatedWeak: Set<Highlightable> = new Set();
 
@@ -121,33 +123,28 @@ export class DataCell extends LitElement implements Highlightable {
 			const end = (this.offset + this.length) % 0x10;
 
 			return html`
-				<span
-					style=${this.styles(this.offset, row++, start)}
-					@mouseenter=${this.highlightOn}
-					@mouseleave=${this.highlightOff}
-					><slot></slot
-				></span>
+				<span style=${this.styles(this.offset, row++, start)}><slot></slot></span>
 				${Array.from({ length: (this.length - start - end) / 0x10 }).map(
-					() =>
-						html`
-							<span
-								style=${this.styles(0, row++, 0x10)}
-								@mouseenter=${this.highlightOn}
-								@mouseleave=${this.highlightOff}
-							></span>
-						`,
+					() => html`<span style=${this.styles(0, row++, 0x10)}></span>`,
 				)}
-				<span style=${this.styles(0, row, end)} @mouseenter=${this.highlightOn} @mouseleave=${this.highlightOff}></span>
+				<span style=${this.styles(0, row, end)}></span>
 			`;
 		}
 
-		return html`
-			<span
-				style=${this.styles(this.offset, row, this.length)}
-				@mouseenter=${this.highlightOn}
-				@mouseleave=${this.highlightOff}
-				><slot></slot
-			></span>
-		`;
+		return html` <span style=${this.styles(this.offset, row, this.length)}><slot></slot></span> `;
+	}
+
+	override connectedCallback() {
+		super.connectedCallback();
+
+		this.listeners.set('mouseenter', () => this.highlightOn());
+		this.listeners.set('mouseleave', () => this.highlightOff());
+
+		this.listeners.forEach((listener, event) => this.addEventListener(event, listener));
+	}
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		this.listeners.forEach((listener, event) => this.removeEventListener(event, listener));
 	}
 }
