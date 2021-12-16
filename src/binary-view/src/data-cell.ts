@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
@@ -14,7 +14,14 @@ export interface RelationData {
 
 @customElement('data-cell')
 export class DataCell extends LitElement implements Highlightable {
-	static override styles = [cellStyles];
+	static override styles = [
+		cellStyles,
+		css`
+			:host([selected]) > span {
+				background: var(--vscode-editor-selectionBackground);
+			}
+		`,
+	];
 
 	private readonly listeners = new Map<string, () => unknown>();
 
@@ -35,6 +42,9 @@ export class DataCell extends LitElement implements Highlightable {
 
 	@property({ reflect: true })
 	highlight: Highlight = 'off';
+
+	@property({ type: Boolean, reflect: true })
+	selected = false;
 
 	private styles(offset: number, row: number, span = 1) {
 		return styleMap({
@@ -131,14 +141,29 @@ export class DataCell extends LitElement implements Highlightable {
 			`;
 		}
 
-		return html` <span style=${this.styles(this.offset, row, this.length)}><slot></slot></span> `;
+		return html`<span style=${this.styles(this.offset, row, this.length)}><slot></slot></span>`;
 	}
 
 	override connectedCallback() {
 		super.connectedCallback();
 
-		this.listeners.set('mouseenter', () => this.highlightOn());
-		this.listeners.set('mouseleave', () => this.highlightOff());
+		this.listeners.set('mousedown', () => {
+			this.selected = !this.selected;
+
+			for (const cell of this.relatedStrong) {
+				if (cell instanceof DataCell) {
+					cell.selected = [...cell.relatedStrong].some((other) => other instanceof DataCell && other.selected);
+				}
+			}
+		});
+
+		this.listeners.set('mouseenter', () => {
+			this.highlightOn();
+		});
+
+		this.listeners.set('mouseleave', () => {
+			this.highlightOff();
+		});
 
 		this.listeners.forEach((listener, event) => this.addEventListener(event, listener));
 	}
