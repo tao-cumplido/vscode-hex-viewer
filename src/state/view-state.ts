@@ -32,13 +32,13 @@ export class ViewState {
 
 	async updateDecodedData(): Promise<void> {
 		if (!this.firstRun) {
-			await this.webview.postMessage({ type: 'decoded', data: null });
+			await this.webview.postMessage({ type: 'text', data: null });
 		}
 
 		const data = this.document.decodeWith(this.decoderItem.decoder);
 
 		await this.webview.postMessage({
-			type: 'decoded',
+			type: 'text',
 			data: data ?? Array.from<null>({ length: this.document.data.length }).fill(null),
 		});
 	}

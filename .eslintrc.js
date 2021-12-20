@@ -124,7 +124,14 @@ module.exports = {
 		'yoda': 'error',
 
 		// https://github.com/tao-cumplido/eslint-plugin-style#rules
-		'style/group-imports': ['error', 'dotenv/config', { class: 'node' }, { class: 'external' }, { class: 'relative' }],
+		'style/group-imports': [
+			'error',
+			'dotenv/config',
+			{ class: 'node' },
+			{ class: 'external' },
+			'./style.css',
+			{ class: 'relative' },
+		],
 		'style/sort-imports': ['error', { caseGroups: true, typesInGroup: 'top' }],
 		// 'style/experimental/no-commented-code': [
 		// 	'warn',

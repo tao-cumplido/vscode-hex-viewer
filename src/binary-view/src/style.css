@@ -1,0 +1,71 @@
+body {
+	--row-height: 2em;
+	font-family: var(--vscode-editor-font-family);
+	user-select: none;
+	place-self: start;
+	display: grid;
+	grid: repeat(2, var(--row-height)) / [offset] auto 0.3rem repeat(16, [byte] auto) 1rem repeat(16, [text] auto) [end];
+	place-content: start;
+}
+
+header,
+main {
+	display: contents;
+}
+
+header > * {
+	grid-row: 1 / span 1;
+	position: sticky;
+	top: 0;
+}
+
+header > .background {
+	grid-column: 1 / end;
+	background: var(--vscode-editor-background);
+	z-index: 100;
+}
+
+header > .progress {
+	--design-unit: 3;
+	grid-column: offset / span 1;
+	display: grid;
+	z-index: 200;
+	place-items: center;
+}
+
+header > .cell {
+	z-index: 200;
+}
+
+main > * {
+	grid-row: 2 / span 1;
+	transform: translateY(var(--y));
+}
+
+main > .offset {
+	grid-column: offset / span 1;
+}
+
+.cell {
+	padding: 0.3em 0.3rem;
+}
+
+.offset {
+	color: var(--vscode-editorLineNumber-foreground);
+}
+
+.empty {
+	color: var(--vscode-editorGhostText-foreground);
+}
+
+.highlight {
+	background: var(--vscode-editor-wordHighlightStrongBackground);
+}
+
+.shadow {
+	background: var(--vscode-editor-hoverHighlightBackground);
+}
+
+.selected {
+	background: var(--vscode-editor-selectionBackground);
+}

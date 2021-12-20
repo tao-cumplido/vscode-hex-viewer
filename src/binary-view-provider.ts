@@ -39,6 +39,7 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 		);
 		const scriptUri = this.webviewUri(webviewPanel.webview, 'dist/src/binary-view/index.js');
 		const vendorUri = this.webviewUri(webviewPanel.webview, 'dist/src/binary-view/vendor.js');
+		const styleUri = this.webviewUri(webviewPanel.webview, 'dist/src/binary-view/index.css');
 
 		webviewPanel.webview.html = /* html */ `
 			<!doctype html>
@@ -49,9 +50,16 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 					<script type="module" src="${vscodeUiToolkitUri}"></script>
 					<script type="module" crossorigin src="${scriptUri}"></script>
 					<link rel="modulepreload" href="${vendorUri}">
+					<link rel="stylesheet" href="${styleUri}">
 				</head>
 				<body>
-					<hex-view></hex-view>
+					<header>
+						<div class="background"></div>
+						<div class="progress">
+							<vscode-progress-ring></vscode-progress-ring>
+						</div>
+					</header>
+					<main></main>
 				</body>
 			</html>
 		`;

@@ -1,34 +1,15 @@
-import { css } from 'lit';
+const parser = new DOMParser();
 
-export type Highlight = 'on' | 'off' | 'weak';
+export function parseDom(html: string): HTMLElement {
+	const element = parser.parseFromString(html, 'text/html').body.firstChild;
 
-export interface Highlightable {
-	highlight: Highlight;
+	if (!(element instanceof HTMLElement)) {
+		throw new Error(`parsed string didn't result in html element`);
+	}
+
+	return element;
 }
 
 export function hex(value: number, pad = 2): string {
 	return value.toString(16).padStart(pad, '0');
 }
-
-export function gridColumn(block: string, offset: number, span: number): string {
-	return `${block} ${(offset % 0x10) + 1} / span ${span}`;
-}
-
-export const cellStyles = css`
-	:host {
-		display: contents;
-	}
-
-	:host([highlight='on']) > span {
-		background: var(--vscode-editor-wordHighlightStrongBackground);
-	}
-
-	:host([highlight='weak']) > span {
-		background: var(--vscode-editor-hoverHighlightBackground);
-	}
-
-	span {
-		padding: 0.2rem 0.3rem;
-		height: 1.2rem;
-	}
-`;

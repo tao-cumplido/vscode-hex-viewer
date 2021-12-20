@@ -5,15 +5,8 @@
 		"build": "vite build",
 		"watch": "vite build --watch --sourcemap --mode development"
 	},
-	"dependencies": {
-		"lit": "2.0.2"
-	},
+	"dependencies": {},
 	"devDependencies": {
-		"clean-css": "5.2.2",
-		"postcss-preset-env": "7.0.1",
-		"rollup-plugin-copy": "3.4.0",
-		"rollup-plugin-minify-html-literals": "1.2.6",
-		"rollup-plugin-inline-postcss": "3.0.1",
 		"vite": "2.6.14"
 	}
 }
