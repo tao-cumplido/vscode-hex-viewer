@@ -66,7 +66,3 @@ These are just ideas that may or may not happen:
 - render control codes with their graphical representation from Unicode's Control Pictures block
 - configurable offset width
 - editing documents
-
-## Known issues
-
-- In short files the rows are distributed evenly across the viewport height for a short moment. This can also be seen in the demonstration above.
