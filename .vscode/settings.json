@@ -6,16 +6,22 @@
 	// Turn off tsc task auto detection since we have the necessary tasks as npm scripts
 	"typescript.tsc.autoDetect": "off",
 	"typescript.tsdk": "node_modules/typescript/lib",
-	"[javascript][typescript]": {
+	"[javascript]": {
 		"editor.formatOnSave": true,
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
 		"editor.codeActionsOnSave": {
-			"source.fixAll.eslint": true,
-			"source.fixAll.stylelint": true
+			"source.fixAll.eslint": true
+		}
+	},
+	"[typescript]": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": true
 		}
 	},
 	"[css][html][json][jsonc]": {
 		"editor.formatOnSave": true,
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
+	}
 }
