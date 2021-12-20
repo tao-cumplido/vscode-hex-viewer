@@ -34,10 +34,14 @@ type DecodedValue =
 		length?: number; // length of the byte sequence, defaults to 1
 		style?: {
 			color?: string; // valid CSS color string, can also be a CSS variable defined by VS Code for theming
-		}
+		};
 	};
 
-type Decoder = (data: Buffer) => DecodedValue[];
+type ProcessInfo = {
+	fileUri: string;
+};
+
+type Decoder = (data: Buffer, info: ProcessInfo) => DecodedValue[];
 ```
 
 When the custom decoder supports multibyte sequences, the result array likely won't be of the same length as the source data. The sum of single and multibyte decodings shouldn't exceed the source data length. If the sum is less than the source data length, the result will be padded with `null` to match the source data length. Custom scripts are *not* sandboxed as VS Code extensions aren't either.
@@ -57,6 +61,7 @@ To use a custom decoder it has to be registered in the settings. The configurati
 These are just ideas that may or may not happen:
 
 - more builtin decoders for standard text encodings like Windows 1252 or UTF-16
+- async decoders
 - make default decoder configurable for file patterns
 - go to offset
 - data inspection

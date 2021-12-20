@@ -67,8 +67,14 @@ function resolveCustomDecoders() {
 
 			clearModule(destinationPath);
 
+			const cwd = process.cwd();
+
+			process.chdir(path.dirname(destinationPath));
+
 			// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 			const decoder: unknown = require(destinationPath);
+
+			process.chdir(cwd);
 
 			if (typeof decoder !== 'function') {
 				throw new TypeError(`Custom decoder '${label}' is not a function`);

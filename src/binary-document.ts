@@ -21,7 +21,9 @@ export class BinaryDocument implements CustomDocument {
 
 	decodeWith(decoder: PotentialDecoder): DecoderResult | null {
 		try {
-			const result: unknown = decoder(this.data);
+			const result: unknown = decoder(this.data, {
+				fileUri: this.uri.toString(),
+			});
 
 			if (!isDecoderResult(result)) {
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
