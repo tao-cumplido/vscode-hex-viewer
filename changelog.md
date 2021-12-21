@@ -2,7 +2,7 @@
 
 All notable changes to the "hex-viewer" extension will be documented in this file.
 
-## [Unreleased]
+## [0.2.1] - 2021-12-21
 ### Changed
 - Working dir inside custom decoder scripts is now relative to the script itself
 ### Added
