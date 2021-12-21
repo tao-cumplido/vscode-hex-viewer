@@ -7,6 +7,8 @@ All notable changes to the "hex-viewer" extension will be documented in this fil
 - Working dir inside custom decoder scripts is now relative to the script itself
 ### Added
 - Pass file URI to custom decoder functions
+### Fixed
+- Selecting and deselecting multibyte cells
 
 ## [0.2.0] - 2021-12-20
 ### Added

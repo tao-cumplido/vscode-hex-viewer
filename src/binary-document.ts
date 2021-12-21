@@ -51,6 +51,9 @@ export class BinaryDocument implements CustomDocument {
 			window.showErrorMessage(`Error while decoding data. See output for details.`);
 			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 			output.appendLine(`${error}\n`);
+			if (error instanceof Error && error.stack) {
+				output.appendLine(error.stack);
+			}
 			return null;
 		}
 	}

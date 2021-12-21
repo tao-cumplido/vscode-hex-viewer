@@ -58,12 +58,12 @@ main > .offset {
 	color: var(--vscode-editorGhostText-foreground);
 }
 
-.highlight {
-	background: var(--vscode-editor-wordHighlightStrongBackground);
-}
-
 .shadow {
 	background: var(--vscode-editor-hoverHighlightBackground);
+}
+
+.highlight {
+	background: var(--vscode-editor-wordHighlightStrongBackground);
 }
 
 .selected {

@@ -12,19 +12,27 @@ export interface TextValue {
 
 export type TextData = null | string | TextValue;
 
-interface RenderRow {
-	readonly offset: HTMLElement;
-	readonly bytes: HTMLElement[];
-	readonly text: HTMLElement[];
+interface DataRow {
+	offset: HTMLElement;
+	bytes: HTMLElement[];
+	text: HTMLElement[];
 }
 
-interface Relation {
-	readonly byte: {
-		readonly strong: HTMLElement[];
-		readonly weak: HTMLElement[];
+interface ByteRelations {
+	row: HTMLElement;
+	column: HTMLElement;
+	weak: HTMLElement[];
+	text: {
+		columns: HTMLElement[];
+		unit: HTMLElement[];
 	};
-	readonly text: HTMLElement[];
-	readonly listeners: Map<string, () => unknown>;
+}
+
+interface TextRelations {
+	rows: HTMLElement[];
+	columns: HTMLElement[];
+	bytes: HTMLElement[];
+	text: HTMLElement[];
 }
 
 const header = document.querySelector('header')!;
@@ -32,11 +40,11 @@ const content = document.querySelector('main')!;
 const progress = document.querySelector<HTMLElement>('.progress')!;
 
 interface HeaderItem {
-	readonly byte: HTMLElement;
-	readonly text: HTMLElement;
+	byte: HTMLElement;
+	text: HTMLElement;
 }
 
-const headerItems: readonly HeaderItem[] = Array.from({ length: 0x10 }).map((_, index) => {
+const headerItems: HeaderItem[] = Array.from({ length: 0x10 }).map((_, index) => {
 	return {
 		byte: parseDom(`<div class="cell offset" style="grid-column: byte ${index + 1} / span 1">${hex(index)}</div>`),
 		text: parseDom(`<div class="cell offset" style="grid-column: text ${index + 1} / span 1">${hex(index)}</div>`),
@@ -60,20 +68,23 @@ function updateRowHeight() {
 
 updateRowHeight();
 
-const renderRows: RenderRow[] = [];
-const relations = new Map<HTMLElement, Relation>();
+const dataRows: DataRow[] = [];
+// const relations = new Map<HTMLElement, Relation>();
+const byteRelations = new Map<HTMLElement, ByteRelations>();
+const textRelations = new Map<HTMLElement, TextRelations>();
+const listeners = new Map<HTMLElement, Map<string, () => unknown>>();
 
 function render() {
 	const aheadRows = 20;
 	const viewportHeight = document.documentElement.clientHeight;
 
 	const start = Math.max(0, Math.floor(document.documentElement.scrollTop / rowHeight) - aheadRows);
-	const end = Math.min(renderRows.length, start + Math.ceil(viewportHeight / rowHeight) + 2 * aheadRows);
+	const end = Math.min(dataRows.length, start + Math.ceil(viewportHeight / rowHeight) + 2 * aheadRows);
 
-	document.body.style.height = `calc(${renderRows.length + 1} * var(--row-height))`;
+	document.body.style.height = `calc(${dataRows.length + 1} * var(--row-height))`;
 
 	content.replaceChildren(
-		...renderRows.slice(start, end).flatMap(({ offset, bytes, text }) => [offset, ...bytes, ...text]),
+		...dataRows.slice(start, end).flatMap(({ offset, bytes, text }) => [offset, ...bytes, ...text]),
 	);
 }
 
@@ -87,96 +98,90 @@ function gridColumn(block: string, offset: number, span = 1) {
 	return `grid-column: ${block} ${(offset % 0x10) + 1} / span ${span}`;
 }
 
-function onMouseEnter(cell: HTMLElement) {
-	return () => {
-		const relation = relations.get(cell)!;
-
-		[...relation.byte.strong, ...relation.text].forEach((related) => {
-			related.classList.add('highlight');
-		});
-
-		relation.byte.weak.forEach((related) => {
-			related.classList.add('shadow');
-		});
-	};
-}
-
-function onMouseLeave(cell: HTMLElement) {
-	return () => {
-		const relation = relations.get(cell)!;
-
-		[...relation.byte.strong, ...relation.text].forEach((related) => {
-			related.classList.remove('highlight');
-		});
-
-		relation.byte.weak.forEach((related) => {
-			related.classList.remove('shadow');
-		});
-	};
-}
-
-function onMouseDown(cell: HTMLElement) {
-	return () => {
-		const relation = relations.get(cell)!;
-
-		cell.classList.toggle('selected');
-
-		[...relation.byte.strong, ...relation.text].forEach((related) => {
-			if (related !== cell && !related.classList.contains('offset')) {
-				const relatedRelation = relations.get(related)!;
-
-				const selected = [...relatedRelation.byte.strong, ...relatedRelation.text].some(
-					(other) => other !== related && !other.classList.contains('offset') && other.classList.contains('selected'),
-				);
-
-				if (selected) {
-					related.classList.add('selected');
-				} else {
-					related.classList.remove('selected');
-				}
-			}
-		});
-	};
-}
-
 export function handleByteData(data: ArrayBuffer): void {
 	const bytes = new Uint8Array(data);
 
 	const hexLength = bytes.length.toString(16).length;
 	const offsetPad = hexLength + (hexLength % 2);
 
-	relations.clear();
+	listeners.forEach((listener, element) => {
+		listener.forEach((callback, event) => element.removeEventListener(event, callback));
+	});
+
+	byteRelations.clear();
+	textRelations.clear();
 
 	bytes.forEach((byte, offset) => {
 		const column = offset % 0x10;
 		const index = Math.floor(offset / 0x10);
 
-		const row = renderRows[index] ?? {
+		const row = dataRows[index] ?? {
 			offset: parseDom(`<div class="cell offset" style="${y(index)}">${hex(index * 0x10, offsetPad)}</div>`),
 			bytes: [],
 			text: [],
 		};
 
-		renderRows[index] = row;
+		dataRows[index] = row;
 
 		const cell = parseDom(`<div class="cell" style="${y(index)}; ${gridColumn('byte', offset)}">${hex(byte)}</div>`);
 
-		const listeners = new Map<string, () => unknown>();
+		const listener = new Map<string, () => unknown>();
 
-		listeners.set('mouseenter', onMouseEnter(cell));
-		listeners.set('mouseleave', onMouseLeave(cell));
-		listeners.set('mousedown', onMouseDown(cell));
+		listener.set('mouseenter', () => {
+			const relations = byteRelations.get(cell)!;
 
-		relations.set(cell, {
-			byte: {
-				strong: [cell, row.offset, headerItems[column]!.byte],
-				weak: [],
-			},
-			text: [],
-			listeners,
+			relations.weak.forEach((element) => {
+				element.classList.add('shadow');
+			});
+
+			[cell, relations.row, relations.column, ...relations.text.columns, ...relations.text.unit].forEach((element) => {
+				element.classList.add('highlight');
+			});
 		});
 
-		listeners.forEach((callback, event) => cell.addEventListener(event, callback));
+		listener.set('mouseleave', () => {
+			const relations = byteRelations.get(cell)!;
+
+			relations.weak.forEach((element) => {
+				element.classList.remove('shadow');
+			});
+
+			[cell, relations.row, relations.column, ...relations.text.columns, ...relations.text.unit].forEach((element) => {
+				element.classList.remove('highlight');
+			});
+		});
+
+		listener.set('mousedown', () => {
+			const relations = byteRelations.get(cell)!;
+
+			cell.classList.toggle('selected');
+
+			relations.text.unit.forEach((element) => {
+				const textRelation = textRelations.get(element)!;
+
+				const selected = textRelation.bytes.some((byteCell) => byteCell.classList.contains('selected'));
+
+				if (selected) {
+					element.classList.add('selected');
+				} else {
+					element.classList.remove('selected');
+				}
+			});
+		});
+
+		listener.forEach((callback, event) => cell.addEventListener(event, callback));
+
+		listeners.set(cell, listener);
+
+		byteRelations.set(cell, {
+			row: row.offset,
+			column: headerItems[column]!.byte,
+			weak: [],
+			text: {
+				columns: [],
+				unit: [],
+			},
+		});
 
 		row.bytes.push(cell);
 	});
@@ -185,62 +190,85 @@ export function handleByteData(data: ArrayBuffer): void {
 }
 
 function updateTextRelations(
-	rows: readonly RenderRow[],
-	columns: readonly HeaderItem[],
-	textCells: readonly HTMLElement[],
-	byteCells: readonly HTMLElement[],
+	rows: DataRow[],
+	columns: HeaderItem[],
+	textCells: HTMLElement[],
+	byteCells: HTMLElement[],
 ) {
-	byteCells.forEach((cell, byteIndex) => {
-		const relation = relations.get(cell);
+	byteCells.forEach((cell) => {
+		const relations = byteRelations.get(cell)!;
 
-		if (!relation) {
-			return;
-		}
-
-		relation.byte.weak.push(
+		relations.weak.push(
 			...byteCells.filter((item) => item !== cell),
-			...columns.filter((_, headerIndex) => headerIndex !== byteIndex).map(({ byte }) => byte),
+			...columns.map(({ byte }) => byte),
 			...rows.filter(({ bytes }) => !bytes.includes(cell)).map(({ offset }) => offset),
 		);
 
-		relation.text.push(...textCells, ...columns.map(({ text }) => text));
+		relations.text.columns.push(...columns.map(({ text }) => text));
+		relations.text.unit.push(...textCells);
 	});
 
 	textCells.forEach((cell) => {
-		const listeners = new Map<string, () => unknown>();
+		const listener = new Map<string, () => unknown>();
 
-		listeners.set('mouseenter', onMouseEnter(cell));
-		listeners.set('mouseleave', onMouseLeave(cell));
-		listeners.set('mousedown', onMouseDown(cell));
+		listener.set('mouseenter', () => {
+			const relations = textRelations.get(cell)!;
 
-		const relation: Relation = {
-			byte: {
-				strong: [...byteCells, ...columns.map(({ byte }) => byte)],
-				weak: [],
-			},
-			text: [...textCells, ...columns.map(({ text }) => text), ...rows.map(({ offset }) => offset)],
-			listeners,
-		};
+			[...relations.rows, ...relations.columns, ...relations.bytes, ...relations.text].forEach((element) => {
+				element.classList.add('highlight');
+			});
+		});
 
-		relations.set(cell, relation);
+		listener.set('mouseleave', () => {
+			const relations = textRelations.get(cell)!;
 
-		listeners.forEach((callback, event) => cell.addEventListener(event, callback));
+			[...relations.rows, ...relations.columns, ...relations.bytes, ...relations.text].forEach((element) => {
+				element.classList.remove('highlight');
+			});
+		});
+
+		listener.set('mousedown', () => {
+			const relations = textRelations.get(cell)!;
+
+			relations.text.forEach((element) => element.classList.toggle('selected'));
+
+			relations.bytes.forEach((element) => {
+				if (cell.classList.contains('selected')) {
+					element.classList.add('selected');
+				} else {
+					element.classList.remove('selected');
+				}
+			});
+		});
+
+		listener.forEach((callback, event) => cell.addEventListener(event, callback));
+
+		listeners.set(cell, listener);
+
+		textRelations.set(cell, {
+			rows: rows.map(({ offset }) => offset),
+			columns: columns.flatMap(({ byte, text }) => [byte, text]),
+			bytes: byteCells,
+			text: textCells,
+		});
 	});
 }
 
 export function handleTextData(data: null | TextData[]): void {
-	renderRows.forEach(({ text }) => {
+	dataRows.forEach(({ text }) => {
 		text.forEach((cell) => {
-			relations.get(cell)?.listeners.forEach((callback, event) => cell.removeEventListener(event, callback));
-			relations.delete(cell);
+			listeners.get(cell)?.forEach((callback, event) => cell.removeEventListener(event, callback));
 		});
 
 		text.length = 0;
 	});
 
-	relations.forEach((relation) => {
-		relation.byte.weak.length = 0;
-		relation.text.length = 0;
+	textRelations.clear();
+
+	byteRelations.forEach((relations) => {
+		relations.weak.length = 0;
+		relations.text.columns.length = 0;
+		relations.text.unit.length = 0;
 	});
 
 	if (data) {
@@ -251,7 +279,7 @@ export function handleTextData(data: null | TextData[]): void {
 		data.forEach((value) => {
 			const column = offset % 0x10;
 			const index = Math.floor(offset / 0x10);
-			const row = renderRows[index]!;
+			const row = dataRows[index]!;
 
 			if (typeof value === 'string' || !value) {
 				const cell = parseDom(
@@ -289,17 +317,17 @@ export function handleTextData(data: null | TextData[]): void {
 					for (let i = index + 1; i < lastIndex; i++) {
 						cell = parseDom(`<div class="cell" style="${y(i)}; ${gridColumn('text', 0, 0x10)}"></div>`);
 						textCells.push(cell);
-						renderRows[i]!.text.push(cell);
+						dataRows[i]!.text.push(cell);
 					}
 
 					cell = parseDom(`<div class="cell" style="${y(lastIndex)}; ${gridColumn('text', 0, end)}"></div>`);
 					textCells.push(cell);
-					renderRows[lastIndex]!.text.push(cell);
+					dataRows[lastIndex]!.text.push(cell);
 
-					const rows = renderRows.slice(index, lastIndex + 1);
+					const rows = dataRows.slice(index, lastIndex + 1);
 
 					const headerCells =
-						textCells.length > 2 ? headerItems : [...headerItems.slice(0, end), ...headerItems.slice(offset)];
+						textCells.length > 2 ? headerItems : [...headerItems.slice(0, end), ...headerItems.slice(column)];
 
 					const byteCells = rows.flatMap(({ bytes }, rowIndex, source) => {
 						if (rowIndex === 0) {
