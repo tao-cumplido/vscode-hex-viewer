@@ -2,7 +2,7 @@
 
 All notable changes to the "hex-viewer" extension will be documented in this file.
 
-## [Unreleased]
+## [0.2.2]
 ### Changed
 - Working dir inside custom decoder scripts is now relative to the workspace the script is in, or relative to the script itself for scripts specified by absolute path
 - Make `text` property of `DecodedValue` objects optional
