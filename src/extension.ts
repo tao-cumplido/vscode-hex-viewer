@@ -48,7 +48,7 @@ function resolveCustomDecoders() {
 
 	return entries.reduce<DecoderItem[]>((result, [label, file]) => {
 		try {
-			const destinationPath = path.isAbsolute(file) ? file : path.resolve(root.uri.fsPath, file);
+			const destinationPath = path.isAbsolute(file) ? file : path.join(root.uri.fsPath, file);
 
 			const currentWatcher = fs.watch(destinationPath, () => {
 				if (customDecoderWatchers.has(currentWatcher)) {
@@ -69,7 +69,7 @@ function resolveCustomDecoders() {
 
 			const cwd = process.cwd();
 
-			process.chdir(path.dirname(destinationPath));
+			process.chdir(path.isAbsolute(file) ? path.dirname(destinationPath) : root.uri.fsPath);
 
 			// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 			const decoder: unknown = require(destinationPath);
