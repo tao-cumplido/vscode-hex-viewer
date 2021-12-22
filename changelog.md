@@ -7,7 +7,7 @@ All notable changes to the "hex-viewer" extension will be documented in this fil
 - Working dir inside custom decoder scripts is now relative to the workspace the script is in, or relative to the script itself for scripts specified by absolute path
 - Make `text` property of `DecodedValue` objects optional
 ### Added
-- Builting decoders for UTF-16
+- Builtin decoders for UTF-16
 
 ## [0.2.1] - 2021-12-21
 ### Changed
