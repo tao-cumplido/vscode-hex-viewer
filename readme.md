@@ -16,10 +16,11 @@ The extension implements builtin decoders for standard text encodings. The follo
 
 - ISO 8859-1 (default)
 - UTF-8
+- UTF-16
 
 Decoders for multibyte encodings like UTF-8 will skip invalid byte sequences and render the skipped bytes with an error color.
 
-## Implement a custom decoder
+## Implementing a custom decoder
 
 Custom decoder scripts are currently only supported in non-virtual workspaces. The decoder script should be a CommonJS script that exports a single function. The function should adhere to the `Decoder` type in the definitions below:
 
@@ -30,7 +31,7 @@ type DecodedValue =
 	| {
 		// can be used for multibyte sequences
 		// or for single byte values that should be rendered in a specific color
-		text: string;
+		text?: string; // treated like null above if not specified
 		length?: number; // length of the byte sequence, defaults to 1
 		style?: {
 			color?: string; // valid CSS color string, can also be a CSS variable defined by VS Code for theming
@@ -60,7 +61,7 @@ To use a custom decoder it has to be registered in the settings. The configurati
 
 These are just ideas that may or may not happen:
 
-- more builtin decoders for standard text encodings like Windows 1252 or UTF-16
+- more builtin decoders for standard text encodings like Windows 1252
 - async decoders
 - make default decoder configurable for file patterns
 - go to offset

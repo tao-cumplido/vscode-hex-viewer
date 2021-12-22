@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import type { Decoder } from './type';
 
 function outOfRange(...values: number[]) {
@@ -6,7 +5,6 @@ function outOfRange(...values: number[]) {
 }
 
 const error = {
-	text: '.',
 	style: {
 		color: 'var(--vscode-editorError-foreground)',
 	},

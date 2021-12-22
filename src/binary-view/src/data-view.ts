@@ -3,7 +3,7 @@
 import { hex, parseDom } from './util';
 
 export interface TextValue {
-	text: string;
+	text?: string;
 	length?: number;
 	style?: {
 		color?: string;
@@ -284,8 +284,7 @@ export function handleTextData(data: null | TextData[]): void {
 			if (typeof value === 'string' || !value) {
 				const cell = parseDom(
 					`<div class="${value ? '' : 'empty '}cell" style="${y(index)}; ${gridColumn('text', offset++)}">${
-						// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-						value || '.'
+						value ?? '.'
 					}</div>`,
 				);
 
@@ -306,9 +305,11 @@ export function handleTextData(data: null | TextData[]): void {
 					const textCells: HTMLElement[] = [];
 
 					let cell = parseDom(
-						`<div class="cell" style="${y(index)}; ${gridColumn('text', offset, start)}; ${additionalStyles}">${
-							value.text
-						}</div>`,
+						`<div class="${value.text ? '' : 'empty '}cell" style="${y(index)}; ${gridColumn(
+							'text',
+							offset,
+							start,
+						)}; ${additionalStyles}">${value.text ?? '.'}</div>`,
 					);
 
 					textCells.push(cell);
@@ -344,9 +345,11 @@ export function handleTextData(data: null | TextData[]): void {
 					updateTextRelations(rows, headerCells, textCells, byteCells);
 				} else {
 					const cell = parseDom(
-						`<div class="cell" style="${y(index)}; ${gridColumn('text', offset, length)}; ${additionalStyles}">${
-							value.text
-						}</div>`,
+						`<div class="${value.text ? '' : 'empty '}cell" style="${y(index)}; ${gridColumn(
+							'text',
+							offset,
+							length,
+						)}; ${additionalStyles}">${value.text ?? '.'}</div>`,
 					);
 
 					const byteCells = row.bytes.slice(column, column + length);

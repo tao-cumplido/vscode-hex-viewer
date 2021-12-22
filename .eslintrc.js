@@ -120,7 +120,6 @@ module.exports = {
 		'prefer-template': 'error',
 		'require-unicode-regexp': 'error',
 		'require-yield': 'error',
-		'symbol-description': 'error',
 		'yoda': 'error',
 
 		// https://github.com/tao-cumplido/eslint-plugin-style#rules

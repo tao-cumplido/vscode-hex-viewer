@@ -28,7 +28,6 @@ const decodedValueSchema = {
 					additionalProperties: false,
 				},
 			},
-			required: ['text'],
 			additionalProperties: false,
 		},
 	],
