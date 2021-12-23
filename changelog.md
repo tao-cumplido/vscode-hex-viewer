@@ -2,7 +2,11 @@
 
 All notable changes to the "hex-viewer" extension will be documented in this file.
 
-## [0.2.2]
+## [Unreleased]
+### Changed
+- Editor webview is suspended instead of unloaded when switching to another tab (requires more memory but otherwise would always reload the data, which takes a moment, and loose context like scroll position)
+
+## [0.2.2] - 2021-12-22
 ### Changed
 - Working dir inside custom decoder scripts is now relative to the workspace the script is in, or relative to the script itself for scripts specified by absolute path
 - Make `text` property of `DecodedValue` objects optional

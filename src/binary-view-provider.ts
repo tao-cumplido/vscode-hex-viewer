@@ -11,7 +11,11 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 	private static readonly viewType = 'hexViewer.binary';
 
 	static register(context: ExtensionContext): Disposable {
-		return window.registerCustomEditorProvider(BinaryViewProvider.viewType, new BinaryViewProvider(context));
+		return window.registerCustomEditorProvider(BinaryViewProvider.viewType, new BinaryViewProvider(context), {
+			webviewOptions: {
+				retainContextWhenHidden: true,
+			},
+		});
 	}
 
 	private readonly context;
