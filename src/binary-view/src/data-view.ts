@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { hex, parseDom } from './util';
+import { createElement, hex } from './util';
 
 export interface TextValue {
 	text?: string;
@@ -46,8 +46,20 @@ interface HeaderItem {
 
 const headerItems: HeaderItem[] = Array.from({ length: 0x10 }).map((_, index) => {
 	return {
-		byte: parseDom(`<div class="cell offset" style="grid-column: byte ${index + 1} / span 1">${hex(index)}</div>`),
-		text: parseDom(`<div class="cell offset" style="grid-column: text ${index + 1} / span 1">${hex(index)}</div>`),
+		byte: createElement('div', {
+			classList: ['cell', 'offset'],
+			style: {
+				'grid-column': `byte ${index + 1} / span 1`,
+			},
+			content: hex(index),
+		}),
+		text: createElement('div', {
+			classList: ['cell', 'offset'],
+			style: {
+				'grid-column': `text ${index + 1} / span 1`,
+			},
+			content: hex(index),
+		}),
 	};
 });
 
@@ -69,7 +81,6 @@ function updateRowHeight() {
 updateRowHeight();
 
 const dataRows: DataRow[] = [];
-// const relations = new Map<HTMLElement, Relation>();
 const byteRelations = new Map<HTMLElement, ByteRelations>();
 const textRelations = new Map<HTMLElement, TextRelations>();
 const listeners = new Map<HTMLElement, Map<string, () => unknown>>();
@@ -91,11 +102,11 @@ function render() {
 window.addEventListener('scroll', render);
 
 function y(index: number) {
-	return `--y: calc(${index} * var(--row-height))`;
+	return { '--y': `calc(${index} * var(--row-height))` };
 }
 
 function gridColumn(block: string, offset: number, span = 1) {
-	return `grid-column: ${block} ${(offset % 0x10) + 1} / span ${span}`;
+	return { 'grid-column': `${block} ${(offset % 0x10) + 1} / span ${span}` };
 }
 
 export function handleByteData(data: ArrayBuffer): void {
@@ -116,14 +127,25 @@ export function handleByteData(data: ArrayBuffer): void {
 		const index = Math.floor(offset / 0x10);
 
 		const row = dataRows[index] ?? {
-			offset: parseDom(`<div class="cell offset" style="${y(index)}">${hex(index * 0x10, offsetPad)}</div>`),
+			offset: createElement('div', {
+				classList: ['cell', 'offset'],
+				style: y(index),
+				content: hex(index * 0x10, offsetPad),
+			}),
 			bytes: [],
 			text: [],
 		};
 
 		dataRows[index] = row;
 
-		const cell = parseDom(`<div class="cell" style="${y(index)}; ${gridColumn('byte', offset)}">${hex(byte)}</div>`);
+		const cell = createElement('div', {
+			classList: ['cell'],
+			style: {
+				...y(index),
+				...gridColumn('byte', offset),
+			},
+			content: hex(byte),
+		});
 
 		const listener = new Map<string, () => unknown>();
 
@@ -282,19 +304,20 @@ export function handleTextData(data: null | TextData[]): void {
 			const row = dataRows[index]!;
 
 			if (typeof value === 'string' || !value) {
-				const cell = parseDom(
-					`<div class="${value ? '' : 'empty '}cell" style="${y(index)}; ${gridColumn('text', offset++)}">${
-						value ?? '.'
-					}</div>`,
-				);
+				const cell = createElement('div', {
+					classList: ['cell', value ? '' : 'empty'],
+					style: {
+						...y(index),
+						...gridColumn('text', offset++),
+					},
+					content: value ?? '.',
+				});
 
 				updateTextRelations([row], [headerItems[column]!], [cell], [row.bytes[column]!]);
 
 				row.text.push(cell);
 			} else {
 				const length = value.length ?? 1;
-
-				const additionalStyles = value.style?.color ? `color: ${value.style.color}` : '';
 
 				if (column + length > 0x10) {
 					const start = (-column + 0x10) % 0x10;
@@ -304,24 +327,40 @@ export function handleTextData(data: null | TextData[]): void {
 
 					const textCells: HTMLElement[] = [];
 
-					let cell = parseDom(
-						`<div class="${value.text ? '' : 'empty '}cell" style="${y(index)}; ${gridColumn(
-							'text',
-							offset,
-							start,
-						)}; ${additionalStyles}">${value.text ?? '.'}</div>`,
-					);
+					let cell = createElement('div', {
+						classList: ['cell', value.text ? '' : 'empty'],
+						style: {
+							...y(index),
+							...gridColumn('text', offset, start),
+							...value.style,
+						},
+						content: value.text ?? '.',
+					});
 
 					textCells.push(cell);
 					row.text.push(cell);
 
 					for (let i = index + 1; i < lastIndex; i++) {
-						cell = parseDom(`<div class="cell" style="${y(i)}; ${gridColumn('text', 0, 0x10)}"></div>`);
+						cell = createElement('div', {
+							classList: ['cell'],
+							style: {
+								...y(i),
+								...gridColumn('text', 0, 0x10),
+							},
+						});
+
 						textCells.push(cell);
 						dataRows[i]!.text.push(cell);
 					}
 
-					cell = parseDom(`<div class="cell" style="${y(lastIndex)}; ${gridColumn('text', 0, end)}"></div>`);
+					cell = createElement('div', {
+						classList: ['cell'],
+						style: {
+							...y(lastIndex),
+							...gridColumn('text', 0, end),
+						},
+					});
+
 					textCells.push(cell);
 					dataRows[lastIndex]!.text.push(cell);
 
@@ -344,13 +383,15 @@ export function handleTextData(data: null | TextData[]): void {
 
 					updateTextRelations(rows, headerCells, textCells, byteCells);
 				} else {
-					const cell = parseDom(
-						`<div class="${value.text ? '' : 'empty '}cell" style="${y(index)}; ${gridColumn(
-							'text',
-							offset,
-							length,
-						)}; ${additionalStyles}">${value.text ?? '.'}</div>`,
-					);
+					const cell = createElement('div', {
+						classList: ['cell', value.text ? '' : 'empty'],
+						style: {
+							...y(index),
+							...gridColumn('text', offset, length),
+							...value.style,
+						},
+						content: value.text ?? '.',
+					});
 
 					const byteCells = row.bytes.slice(column, column + length);
 					const headerCells = headerItems.slice(column, column + length);

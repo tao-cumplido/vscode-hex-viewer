@@ -1,10 +1,29 @@
-const parser = new DOMParser();
+export interface CreateElementData {
+	classList?: string[];
+	style?: Record<string, string>;
+	content?: string | Element;
+}
 
-export function parseDom(html: string): HTMLElement {
-	const element = parser.parseFromString(html, 'text/html').body.firstChild;
+export function createElement<T extends keyof HTMLElementTagNameMap>(
+	name: T,
+	data?: CreateElementData,
+): HTMLElementTagNameMap[T] {
+	const element = document.createElement(name);
 
-	if (!(element instanceof HTMLElement)) {
-		throw new Error(`parsed string didn't result in html element`);
+	if (data?.classList) {
+		element.classList.add(...data.classList.filter(Boolean));
+	}
+
+	if (data?.style) {
+		Object.entries(data.style).forEach(([property, value]) => {
+			element.style.setProperty(property, value);
+		});
+	}
+
+	if (typeof data?.content === 'string') {
+		element.textContent = data.content;
+	} else if (data?.content) {
+		element.appendChild(data.content);
 	}
 
 	return element;
