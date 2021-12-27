@@ -1,0 +1,12 @@
+{
+	"name": "@hex/extension",
+	"private": true,
+	"scripts": {
+		"build": "tsc -p ./tsconfig.json",
+		"watch": "tsc -watch -p ./tsconfig.json"
+	},
+	"dependencies": {
+		"ajv": "8.8.2",
+		"clear-module": "4.1.2"
+	}
+}

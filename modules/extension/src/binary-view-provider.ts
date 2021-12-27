@@ -41,8 +41,8 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 			webviewPanel.webview,
 			'node_modules/@vscode/webview-ui-toolkit/dist/toolkit.js',
 		);
-		const scriptUri = this.webviewUri(webviewPanel.webview, 'dist/src/binary-view/index.js');
-		const styleUri = this.webviewUri(webviewPanel.webview, 'dist/src/binary-view/index.css');
+		const scriptUri = this.webviewUri(webviewPanel.webview, 'dist/editor/index.js');
+		const styleUri = this.webviewUri(webviewPanel.webview, 'dist/editor/index.css');
 
 		webviewPanel.webview.html = /* html */ `
 			<!doctype html>

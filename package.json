@@ -4,7 +4,7 @@
 	"description": "View files in byte representation with multiple decoding options.",
 	"version": "0.2.2",
 	"workspaces": [
-		"src/binary-view"
+		"modules/*"
 	],
 	"engines": {
 		"vscode": "^1.62.0"
@@ -24,7 +24,7 @@
 	"activationEvents": [
 		"onCustomEditor:hexViewer.binary"
 	],
-	"main": "./dist/src/extension.js",
+	"main": "./dist/extension/extension.js",
 	"publisher": "tao-cumplido",
 	"contributes": {
 		"configuration": {
@@ -75,28 +75,28 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./tsconfig.src.json && npm run -w binary-view build",
-		"watch:extension": "tsc -watch -p ./tsconfig.src.json",
-		"watch:webview": "npm run -w binary-view watch",
+		"vscode:prepublish": "npm run build",
+		"build": "npm run build --workspaces",
+		"watch:extension": "npm run -w @hex/extension watch",
+		"watch:editor": "npm run -w @hex/editor watch",
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"@vscode/webview-ui-toolkit": "0.8.4",
-		"ajv": "8.8.2",
-		"clear-module": "4.1.2"
+		"@vscode/webview-ui-toolkit": "0.8.4"
 	},
 	"devDependencies": {
 		"@types/vscode": "1.62.0",
 		"@types/node": "14.17.33",
 		"@typescript-eslint/eslint-plugin": "5.4.0",
 		"@typescript-eslint/parser": "5.4.0",
+		"esbuild": "0.14.8",
 		"eslint": "8.2.0",
 		"eslint-plugin-style": "0.1.7",
 		"json-schema-to-ts": "1.6.4",
 		"prettier": "2.4.1",
 		"prettier-plugin-sh": "0.7.1",
 		"typescript": "4.4.4",
+		"vite": "2.7.7",
 		"vsce": "2.5.3"
 	}
 }

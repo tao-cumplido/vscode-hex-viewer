@@ -6,7 +6,7 @@ export default defineConfig({
 	root: path.resolve(__dirname, 'src'),
 	publicDir: path.resolve(__dirname, 'public'),
 	build: {
-		outDir: '../../../dist/src/binary-view',
+		outDir: '../../../dist/editor',
 		emptyOutDir: true,
 		rollupOptions: {
 			output: {

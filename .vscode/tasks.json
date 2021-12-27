@@ -14,9 +14,9 @@
 			}
 		},
 		{
-			"label": "Watch Webview",
+			"label": "Watch Editor",
 			"type": "npm",
-			"script": "watch:webview",
+			"script": "watch:editor",
 			"problemMatcher": {
 				"pattern": [
 					{
@@ -43,7 +43,7 @@
 		},
 		{
 			"label": "Watch",
-			"dependsOn": ["Watch Extension", "Watch Webview"],
+			"dependsOn": ["Watch Extension", "Watch Editor"],
 			"group": {
 				"kind": "build",
 				"isDefault": true
