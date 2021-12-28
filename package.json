@@ -24,7 +24,7 @@
 	"activationEvents": [
 		"onCustomEditor:hexViewer.binary"
 	],
-	"main": "./dist/extension/extension.js",
+	"main": "./dist/extension.js",
 	"publisher": "tao-cumplido",
 	"contributes": {
 		"configuration": {

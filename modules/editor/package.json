@@ -3,6 +3,6 @@
 	"private": true,
 	"scripts": {
 		"build": "vite build",
-		"watch": "vite build --watch --sourcemap --mode development"
+		"watch": "vite build --watch --sourcemap --minify false --mode development"
 	}
 }

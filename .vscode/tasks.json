@@ -7,7 +7,26 @@
 			"label": "Watch Extension",
 			"type": "npm",
 			"script": "watch:extension",
-			"problemMatcher": "$tsc-watch",
+			"problemMatcher": {
+				"pattern": [
+					{
+						"regexp": "^[X▲►→●♦✘▶⬥] \\[([A-Z]+)\\] (.+)$",
+						"severity": 1,
+						"message": 2
+					},
+					{
+						"regexp": "^    (.+?):(\\d+):(\\d+):$",
+						"file": 1,
+						"line": 2,
+						"column": 3
+					}
+				],
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "build started",
+					"endsPattern": "build finished"
+				}
+			},
 			"isBackground": true,
 			"presentation": {
 				"group": "watch"

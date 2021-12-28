@@ -2,8 +2,9 @@
 	"name": "@hex/extension",
 	"private": true,
 	"scripts": {
-		"build": "tsc -p ./tsconfig.json",
-		"watch": "tsc -watch -p ./tsconfig.json"
+		"esbuild": "esbuild ./src/extension.ts --bundle --outfile=../../dist/extension.js --external:vscode --format=cjs --platform=node",
+		"build": "tsc -noEmit && npm run esbuild -- --minify",
+		"watch": "npm run esbuild -- --sourcemap --watch"
 	},
 	"dependencies": {
 		"ajv": "8.8.2",
