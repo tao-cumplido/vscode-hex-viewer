@@ -5,6 +5,8 @@ All notable changes to the "hex-viewer" extension will be documented in this fil
 ## [Unreleased]
 ### Changed
 - Editor webview is suspended instead of unloaded when switching to another tab (requires more memory but otherwise would always reload the data, which takes a moment, and loose context like scroll position)
+### Fixed
+- Opening a new editor view from another active view of this extension would result in a wrong state and not show the decoder selection status bar item
 
 ## [0.2.2] - 2021-12-22
 ### Changed

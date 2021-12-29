@@ -67,26 +67,21 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 		`;
 
 		webviewPanel.onDidChangeViewState(() => {
-			const currentView = viewStates.get(webviewPanel.webview);
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			const currentView = viewStates.get(webviewPanel.webview)!;
 
-			if (webviewPanel.active && currentView) {
-				state.activeView = currentView;
+			if (webviewPanel.visible) {
+				state.visibleViews.add(currentView);
 			} else {
-				state.activeView = null;
+				state.visibleViews.delete(currentView);
 			}
 
-			if (currentView) {
-				if (webviewPanel.visible) {
-					state.visibleViews.add(currentView);
-				} else {
-					state.visibleViews.delete(currentView);
-				}
-			}
-
-			if (state.activeView) {
+			if (webviewPanel.active) {
+				state.activeView = currentView;
 				state.activeDecoderStatusItem.text = state.activeView.decoderItem.label;
 				state.activeDecoderStatusItem.show();
-			} else {
+			} else if (state.activeView === currentView) {
+				state.activeView = null;
 				state.activeDecoderStatusItem.hide();
 			}
 		});
@@ -97,6 +92,11 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 		state.activeView = viewState;
 		state.activeDecoderStatusItem.text = viewState.decoderItem.label;
 		state.activeDecoderStatusItem.show();
+
 		viewStates.set(webviewPanel.webview, viewState);
+
+		if (webviewPanel.visible) {
+			state.visibleViews.add(viewState);
+		}
 	}
 }
