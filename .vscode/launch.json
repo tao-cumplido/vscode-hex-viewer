@@ -11,8 +11,17 @@
 			"debugWebviews": true,
 			"request": "launch",
 			"args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-			"outFiles": ["${workspaceFolder}/dist/src/**/*.js"],
+			"outFiles": ["${workspaceFolder}/dist/**/*.js", "!${workspaceFolder}/dist/extension.web.js"],
 			"preLaunchTask": "${defaultBuildTask}"
+		},
+		{
+			"name": "Run Web Extension",
+			"type": "pwa-extensionHost",
+			"debugWebWorkerHost": true,
+			"request": "launch",
+			"args": ["--extensionDevelopmentPath=${workspaceFolder}", "--extensionDevelopmentKind=web"],
+			"outFiles": ["${workspaceFolder}/dist/**/*.js", "!${workspaceFolder}/dist/extension.js"],
+			"preLaunchTask": "Run Browser"
 		}
 	]
 }

@@ -1,11 +1,10 @@
 import type { QuickPickItem } from 'vscode';
 
-import type { PotentialDecoder } from './type';
+import type { PotentialDecoder } from '@hex/types';
+
 import iso88591 from './iso-8859-1';
 import utf8 from './utf-8';
 import utf16 from './utf-16';
-
-export * from './type';
 
 export interface DecoderItem extends QuickPickItem {
 	readonly decoder: PotentialDecoder;

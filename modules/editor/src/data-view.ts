@@ -1,16 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
+import type { DecoderResult } from '@hex/types';
+
 import { createElement, hex } from './util';
-
-export interface TextValue {
-	text?: string;
-	length?: number;
-	style?: {
-		color?: string;
-	};
-}
-
-export type TextData = null | string | TextValue;
 
 interface DataRow {
 	offset: HTMLElement;
@@ -276,7 +268,7 @@ function updateTextRelations(
 	});
 }
 
-export function handleTextData(data: null | TextData[]): void {
+export function handleTextData(data: null | DecoderResult): void {
 	dataRows.forEach(({ text }) => {
 		text.forEach((cell) => {
 			listeners.get(cell)?.forEach((callback, event) => cell.removeEventListener(event, callback));

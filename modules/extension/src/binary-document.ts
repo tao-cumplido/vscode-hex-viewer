@@ -1,8 +1,9 @@
 import type { CustomDocument, Uri } from 'vscode';
 import { window, workspace } from 'vscode';
 
-import type { DecoderResult, PotentialDecoder } from './decoders';
-import { isDecoderResult } from './decoders';
+import type { DecoderResult, PotentialDecoder } from '@hex/types';
+import { isDecoderResult } from '@hex/types';
+
 import { output } from './output';
 import { state } from './state';
 

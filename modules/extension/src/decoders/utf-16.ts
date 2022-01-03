@@ -1,4 +1,4 @@
-import type { Decoder } from './type';
+import type { Decoder } from '@hex/types';
 
 const error = (length: number) => ({
 	length,

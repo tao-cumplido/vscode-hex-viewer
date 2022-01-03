@@ -25,7 +25,14 @@
 		"onCustomEditor:hexViewer.binary"
 	],
 	"main": "./dist/extension.js",
+	"browser": "./dist/extension.web.js",
 	"publisher": "tao-cumplido",
+	"capabilities": {
+		"virtualWorkspaces": {
+			"supported": "limited",
+			"description": "Custom decoders are not supported in virtual workspaces."
+		}
+	},
 	"contributes": {
 		"configuration": {
 			"title": "Hex Viewer",
@@ -77,7 +84,8 @@
 	"scripts": {
 		"vscode:prepublish": "npm run build",
 		"build": "npm run build --workspaces",
-		"watch:extension": "npm run -w @hex/extension watch",
+		"watch:extension:node": "npm run -w @hex/extension watch:node",
+		"watch:extension:browser": "npm run -w @hex/extension watch:browser",
 		"watch:editor": "npm run -w @hex/editor watch",
 		"lint": "eslint ."
 	},

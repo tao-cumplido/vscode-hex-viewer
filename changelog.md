@@ -2,6 +2,10 @@
 
 All notable changes to the "hex-viewer" extension will be documented in this file.
 
+## [Unreleased]
+### Added
+- Web Extension support
+
 ## [0.2.3] - 2021-12-29
 ### Changed
 - Editor webview is suspended instead of unloaded when switching to another tab (requires more memory but otherwise would always reload the data, which takes a moment, and loose context like scroll position)

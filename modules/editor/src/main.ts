@@ -2,7 +2,8 @@
 
 import './style.css';
 
-import type { TextData } from './data-view';
+import type { DecoderResult } from '@hex/types';
+
 import { handleByteData, handleTextData } from './data-view';
 import { vscode } from './vscode';
 
@@ -11,7 +12,7 @@ interface DataMessage<T extends string, D> {
 	data: D;
 }
 
-type HostMessage = DataMessage<'bytes', ArrayBuffer> | DataMessage<'text', null | TextData[]>;
+type HostMessage = DataMessage<'bytes', ArrayBuffer> | DataMessage<'text', null | DecoderResult>;
 
 addEventListener('message', ({ data: message }: MessageEvent<HostMessage>) => {
 	switch (message.type) {

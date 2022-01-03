@@ -1,4 +1,4 @@
-import type { Decoder } from './type';
+import type { Decoder } from '@hex/types';
 
 function outOfRange(...values: number[]) {
 	return values.some((value) => value < 0b1000_0000 || value >= 0b1100_0000);
