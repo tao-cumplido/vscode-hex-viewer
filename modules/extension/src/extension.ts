@@ -1,18 +1,27 @@
 import type { ExtensionContext } from 'vscode';
-import { commands, window, workspace, StatusBarAlignment } from 'vscode';
+import { commands, window, workspace, QuickPickItemKind, StatusBarAlignment } from 'vscode';
 
 import { BinaryViewProvider } from './binary-view-provider';
 import { resolveCustomDecoders } from './custom-decoders';
 import { builtinDecoders, defaultDecoder } from './decoders';
 import { state } from './state';
 
+declare module 'vscode' {
+	// eslint-disable-next-line @typescript-eslint/no-namespace, @typescript-eslint/no-shadow
+	export namespace window {
+		export function showQuickPick<T extends QuickPickItem>(
+			items: readonly T[] | Thenable<readonly T[]>,
+			options?: QuickPickOptions,
+			token?: CancellationToken,
+		): Thenable<Exclude<T, QuickPickItem & { kind: QuickPickItemKind.Separator }> | undefined>;
+	}
+}
+
 function reloadDecoders() {
 	state.decoderItems = [...builtinDecoders, ...resolveCustomDecoders(reloadDecoders)];
 	state.allViews.forEach((view) => {
 		const item = state.decoderItems.find(({ label }) => label === view.decoderItem.label);
 		view.decoderItem = item ?? defaultDecoder;
-	});
-	state.visibleViews.forEach((view) => {
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		view.updateDecodedData();
 	});
@@ -38,7 +47,17 @@ export function activate(context: ExtensionContext): void {
 
 	context.subscriptions.push(
 		commands.registerCommand('hexViewer.selectDecoder', async () => {
-			const item = await window.showQuickPick(state.decoderItems);
+			const items =
+				state.decoderItems.length > builtinDecoders.length
+					? ([
+							{ label: 'Built-in', kind: QuickPickItemKind.Separator },
+							...builtinDecoders,
+							{ label: 'Custom', kind: QuickPickItemKind.Separator },
+							...state.decoderItems.slice(builtinDecoders.length),
+					  ] as const)
+					: builtinDecoders;
+
+			const item = await window.showQuickPick(items);
 
 			if (item && state.activeView) {
 				state.activeDecoderStatusItem.text = item.label;

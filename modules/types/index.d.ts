@@ -15,7 +15,16 @@ declare namespace module {
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	export type PotentialDecoder = Function;
 
-	export type Decoder = (data: Uint8Array) => DecoderResult;
+	export type RenderControlCharacters = 'hex' | 'abbreviation' | 'escape' | 'caret' | 'picture';
+
+	export interface DecoderConfig {
+		readonly fileUri: string;
+		readonly settings: {
+			readonly renderControlCharacters: 'off' | RenderControlCharacters | RenderControlCharacters[];
+		};
+	}
+
+	export type Decoder = (data: Uint8Array, config: DecoderConfig) => DecoderResult;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare

@@ -3,8 +3,16 @@
 All notable changes to the "hex-viewer" extension will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- Default decoder is ASCII now
 ### Added
 - Web Extension support
+- Decoders for basic ASCII and UTF-32
+- Configuration `hexViewer.decode.renderControlCharacters`
+- Pass `hexViewer.decode` settings to decoder function
+### Fixed
+- Some UTF-8 edge cases
+- Rerun decoder for open editors when configuration changes
 
 ## [0.2.3] - 2021-12-29
 ### Changed

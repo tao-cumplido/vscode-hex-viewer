@@ -24,6 +24,7 @@ export class BinaryDocument implements CustomDocument {
 		try {
 			const result: unknown = decoder(this.data, {
 				fileUri: this.uri.toString(),
+				settings: workspace.getConfiguration('hexViewer.decode'),
 			});
 
 			if (!isDecoderResult(result)) {
