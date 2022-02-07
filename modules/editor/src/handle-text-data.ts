@@ -2,9 +2,10 @@
 
 import type { DecoderResult } from '@hex/types';
 
-import type { DataRow, HeaderItem } from './init';
+import type { DataRow, HeaderItem } from './types';
 import { createElement } from './create-element';
-import { byteRelations, dataRows, headerItems, listeners, progress, renderRows, textRelations } from './init';
+import { render } from './render';
+import { byteRelations, dataRows, headerItems, listeners, progress, textRelations } from './state';
 import { gridColumn, y } from './style';
 
 function updateTextRelations(
@@ -204,5 +205,5 @@ export function handleTextData(data: null | DecoderResult): void {
 		progress.style.display = '';
 	}
 
-	renderRows();
+	render();
 }

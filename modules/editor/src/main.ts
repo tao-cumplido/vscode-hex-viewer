@@ -4,7 +4,10 @@ import './style.css';
 
 import type { DecoderResult } from '@hex/types';
 
-import { handleByteData, handleTextData } from './render';
+import { handleByteData } from './handle-byte-data';
+import { handleTextData } from './handle-text-data';
+import { render } from './render';
+import { header, headerItems, updateRowHeight } from './state';
 import { vscode } from './vscode';
 
 interface DataMessage<T extends string, D> {
@@ -14,7 +17,13 @@ interface DataMessage<T extends string, D> {
 
 type HostMessage = DataMessage<'bytes', ArrayBuffer> | DataMessage<'text', null | DecoderResult>;
 
-addEventListener('message', ({ data: message }: MessageEvent<HostMessage>) => {
+header.append(...headerItems.flatMap(({ byte, text }) => [byte, text]));
+
+updateRowHeight();
+
+window.addEventListener('scroll', render);
+
+window.addEventListener('message', ({ data: message }: MessageEvent<HostMessage>) => {
 	switch (message.type) {
 		case 'bytes':
 			return handleByteData(message.data);

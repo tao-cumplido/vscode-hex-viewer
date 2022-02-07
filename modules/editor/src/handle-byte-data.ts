@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { createElement } from './create-element';
 import { hex } from './hex';
-import { byteRelations, dataRows, headerItems, listeners, renderRows, textRelations } from './init';
+import { render } from './render';
+import { byteRelations, dataRows, headerItems, listeners, textRelations } from './state';
 import { gridColumn, y } from './style';
 
 export function handleByteData(data: ArrayBuffer): void {
@@ -103,5 +104,5 @@ export function handleByteData(data: ArrayBuffer): void {
 		row.bytes.push(cell);
 	});
 
-	renderRows();
+	render();
 }

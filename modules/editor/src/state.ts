@@ -1,35 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
+import type { ByteRelations, DataRow, HeaderItem, TextRelations } from './types';
 import { createElement } from './create-element';
 import { hex } from './hex';
-
-export interface DataRow {
-	offset: HTMLElement;
-	bytes: HTMLElement[];
-	text: HTMLElement[];
-}
-
-export interface ByteRelations {
-	row: HTMLElement;
-	column: HTMLElement;
-	weak: HTMLElement[];
-	text: {
-		columns: HTMLElement[];
-		unit: HTMLElement[];
-	};
-}
-
-export interface TextRelations {
-	rows: HTMLElement[];
-	columns: HTMLElement[];
-	bytes: HTMLElement[];
-	text: HTMLElement[];
-}
-
-export interface HeaderItem {
-	byte: HTMLElement;
-	text: HTMLElement;
-}
 
 export const header = document.querySelector('header')!;
 export const content = document.querySelector('main')!;
@@ -59,7 +32,7 @@ export const headerItems: HeaderItem[] = Array.from({ length: 0x10 }).map((_, in
 	};
 });
 
-let rowHeight = 0;
+export let rowHeight = 0;
 
 export function updateRowHeight(): void {
 	/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
@@ -71,23 +44,3 @@ export function updateRowHeight(): void {
 	rowHeight = rowHeightEm.value * fontSize.value;
 	/* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
 }
-
-export function renderRows(): void {
-	const aheadRows = 20;
-	const viewportHeight = document.documentElement.clientHeight;
-
-	const start = Math.max(0, Math.floor(document.documentElement.scrollTop / rowHeight) - aheadRows);
-	const end = Math.min(dataRows.length, start + Math.ceil(viewportHeight / rowHeight) + 2 * aheadRows);
-
-	document.body.style.height = `calc(${dataRows.length + 1} * var(--row-height))`;
-
-	content.replaceChildren(
-		...dataRows.slice(start, end).flatMap(({ offset, bytes, text }) => [offset, ...bytes, ...text]),
-	);
-}
-
-header.append(...headerItems.flatMap(({ byte, text }) => [byte, text]));
-
-updateRowHeight();
-
-window.addEventListener('scroll', renderRows);
