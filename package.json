@@ -2,7 +2,7 @@
 	"name": "hex-viewer",
 	"displayName": "Hex Viewer",
 	"description": "View files in byte representation with multiple decoding options.",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"workspaces": [
 		"modules/*"
 	],
