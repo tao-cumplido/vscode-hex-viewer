@@ -4,7 +4,7 @@ import './style.css';
 
 import type { DecoderResult } from '@hex/types';
 
-import { handleByteData, handleTextData } from './data-view';
+import { handleByteData, handleTextData } from './render';
 import { vscode } from './vscode';
 
 interface DataMessage<T extends string, D> {
