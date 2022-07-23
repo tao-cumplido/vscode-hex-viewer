@@ -42,14 +42,14 @@ type DecodedValue =
 
 type RenderControlCharacters = 'hex' | 'abbreviation' | 'escape' | 'caret' | 'picture';
 
-interface DecoderConfig = {
+interface DecoderState = {
 	fileUri: string;
 	settings: {
 		renderControlCharacters: 'off' | RenderControlCharacters | RenderControlCharacters[];
 	};
 };
 
-type Decoder = (data: Buffer, config: DecoderConfig) => DecodedValue[];
+type Decoder = (data: Buffer, config: DecoderState) => DecodedValue[];
 ```
 
 When the custom decoder supports multibyte sequences, the result array likely won't be of the same length as the source data. The sum of single and multibyte decodings shouldn't exceed the source data length. If the sum is less than the source data length, the result will be padded with `null` to match the source data length. Custom scripts are *not* sandboxed as VS Code extensions aren't either. The script's working dir is the workspace it is in or relative to the script itself if it is outside the workspace (specified by an absolute path).

@@ -5,7 +5,7 @@ import type { DecoderResult } from '@hex/types';
 import type { DataRow, HeaderItem } from './types';
 import { createElement } from './create-element';
 import { render } from './render';
-import { byteRelations, dataRows, headerItems, listeners, progress, textRelations } from './state';
+import { byteRelations, headerItems, listeners, page, progress, textRelations } from './state';
 import { gridColumn, y } from './style';
 
 function updateTextRelations(
@@ -74,7 +74,7 @@ function updateTextRelations(
 }
 
 export function handleTextData(data: null | DecoderResult): void {
-	dataRows.forEach(({ text }) => {
+	page.currentData.forEach(({ text }) => {
 		text.forEach((cell) => {
 			listeners.get(cell)?.forEach((callback, event) => cell.removeEventListener(event, callback));
 		});
@@ -98,7 +98,7 @@ export function handleTextData(data: null | DecoderResult): void {
 		data.forEach((value) => {
 			const column = offset % 0x10;
 			const index = Math.floor(offset / 0x10);
-			const row = dataRows[index]!;
+			const row = page.currentData[index]!;
 
 			if (typeof value === 'string' || !value) {
 				const cell = createElement('div', {
@@ -147,7 +147,7 @@ export function handleTextData(data: null | DecoderResult): void {
 						});
 
 						textCells.push(cell);
-						dataRows[i]!.text.push(cell);
+						page.currentData[i]!.text.push(cell);
 					}
 
 					cell = createElement('div', {
@@ -159,9 +159,9 @@ export function handleTextData(data: null | DecoderResult): void {
 					});
 
 					textCells.push(cell);
-					dataRows[lastIndex]!.text.push(cell);
+					page.currentData[lastIndex]!.text.push(cell);
 
-					const rows = dataRows.slice(index, lastIndex + 1);
+					const rows = page.currentData.slice(index, lastIndex + 1);
 
 					const headerCells =
 						textCells.length > 2 ? headerItems : [...headerItems.slice(0, end), ...headerItems.slice(column)];

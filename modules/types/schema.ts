@@ -29,8 +29,19 @@ const decodedValue = {
 } as const;
 
 const decoderResult = {
-	type: 'array',
-	items: decodedValue,
+	type: 'object',
+	properties: {
+		offset: {
+			type: 'integer',
+			minimum: 0,
+		},
+		values: {
+			type: 'array',
+			items: decodedValue,
+		},
+	},
+	required: ['offset', 'values'],
+	additionalProperties: false,
 } as const;
 
 export const schemas = {

@@ -1,6 +1,8 @@
+import type { ClientMessage } from '@hex/types';
+
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call */
 interface VsCodeApi {
-	postMessage: (message: unknown) => void;
+	postMessage: (message: ClientMessage) => void;
 	getState: () => unknown;
 	setState: (value: unknown) => void;
 }

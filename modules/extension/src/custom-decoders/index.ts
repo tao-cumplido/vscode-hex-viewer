@@ -4,6 +4,8 @@ import path from 'path';
 import clearModule from 'clear-module';
 import { window, workspace } from 'vscode';
 
+import type { PotentialDecoder } from '@hex/types';
+
 import type { DecoderItem } from '../decoders';
 import { output } from '../output';
 import { state } from '../state';
@@ -77,7 +79,7 @@ export function resolveCustomDecoders(reload: () => void): DecoderItem[] {
 
 			result.push({
 				label,
-				decoder,
+				decoder: decoder as PotentialDecoder,
 			});
 		} catch (error) {
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises

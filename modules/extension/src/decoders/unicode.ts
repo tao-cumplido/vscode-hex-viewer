@@ -7,10 +7,10 @@ import { resolveControlCharacter } from './control-characters';
 import { errorItem } from './error';
 
 export function unicode(type: DataChar): Decoder {
-	return (data, { settings: { renderControlCharacters } }) => {
+	return (data, { offset, settings: { renderControlCharacters } }) => {
 		const reader = new BinaryReader(data);
 
-		const decoded = [];
+		const values = [];
 
 		while (reader.hasNext) {
 			try {
@@ -21,9 +21,9 @@ export function unicode(type: DataChar): Decoder {
 
 				if (codePoint < 0x21 || (codePoint >= 0x7f && codePoint < 0xa0)) {
 					if (renderControlCharacters === 'off') {
-						decoded.push({ length: byteLength });
+						values.push({ length: byteLength });
 					} else {
-						decoded.push({
+						values.push({
 							text: resolveControlCharacter(codePoint, renderControlCharacters),
 							length: byteLength,
 							style: {
@@ -34,14 +34,14 @@ export function unicode(type: DataChar): Decoder {
 					continue;
 				}
 
-				decoded.push({
+				values.push({
 					text: value,
 					length: byteLength,
 				});
 			} catch (error) {
 				if (error instanceof ReadError) {
 					const length = Math.min(error.bytes.length, type.encoding.minBytes);
-					decoded.push(errorItem(length));
+					values.push(errorItem(length));
 					reader.skip(length);
 				} else {
 					throw error;
@@ -49,6 +49,6 @@ export function unicode(type: DataChar): Decoder {
 			}
 		}
 
-		return decoded;
+		return { offset, values };
 	};
 }

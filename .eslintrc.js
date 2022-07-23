@@ -108,7 +108,6 @@ module.exports = {
 		'operator-assignment': 'error',
 		'prefer-arrow-callback': 'error',
 		'prefer-const': 'error',
-		'prefer-destructuring': 'error',
 		'prefer-exponentiation-operator': 'error',
 		'prefer-named-capture-group': 'error',
 		'prefer-numeric-literals': 'error',

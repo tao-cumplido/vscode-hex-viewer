@@ -1,10 +1,27 @@
+import type { HostMessageMap } from '@hex/types';
+
 export interface DataRow {
 	readonly offset: HTMLElement;
 	readonly bytes: HTMLElement[];
 	readonly text: HTMLElement[];
 }
 
-export interface ByteRelations {
+export interface Data {
+	offset: number;
+	byteLength: number;
+	rows: DataRow[];
+}
+
+export type Stat = HostMessageMap['stat'] & {
+	fileRows: number;
+	offsetHexDigitCount: number;
+};
+
+export interface Flags {
+	fetchInProgress: boolean;
+}
+
+export interface ByteRelation {
 	readonly row: HTMLElement;
 	readonly column: HTMLElement;
 	readonly weak: HTMLElement[];
@@ -14,7 +31,7 @@ export interface ByteRelations {
 	};
 }
 
-export interface TextRelations {
+export interface TextRelation {
 	readonly rows: readonly HTMLElement[];
 	readonly columns: readonly HTMLElement[];
 	readonly bytes: readonly HTMLElement[];

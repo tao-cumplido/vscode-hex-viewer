@@ -33,6 +33,11 @@ header > .progress {
 	place-items: center;
 }
 
+header > .spacer {
+	grid-column: offset / span 1;
+	visibility: hidden;
+}
+
 header > .cell {
 	z-index: 200;
 }

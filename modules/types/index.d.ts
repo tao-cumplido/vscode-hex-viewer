@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 
+import type { FileHandle } from 'fs/promises';
+
 import type { FromSchema } from 'json-schema-to-ts';
 
 type Schemas = typeof import('./schema').schemas;
@@ -12,19 +14,51 @@ type Module = {
 declare namespace module {
 	export type DecoderResult = FromSchema<Schemas['decoderResult']>;
 
-	// eslint-disable-next-line @typescript-eslint/ban-types
-	export type PotentialDecoder = Function;
-
 	export type RenderControlCharacters = 'hex' | 'abbreviation' | 'escape' | 'caret' | 'picture';
 
-	export interface DecoderConfig {
-		readonly fileUri: string;
+	export interface DecoderState {
+		readonly offset: number;
+		readonly file: {
+			readonly byteLength: number;
+			readonly uri: string;
+			readonly handle: FileHandle;
+		};
 		readonly settings: {
 			readonly renderControlCharacters: 'off' | RenderControlCharacters | RenderControlCharacters[];
 		};
 	}
 
-	export type Decoder = (data: Uint8Array, config: DecoderConfig) => DecoderResult;
+	export type Decoder = (data: Uint8Array, config: DecoderState) => DecoderResult | Promise<DecoderResult>;
+
+	export type PotentialDecoder = (...args: Parameters<Decoder>) => unknown;
+
+	export type DataMessage<T extends string, D = undefined> = D extends undefined
+		? { type: T }
+		: { type: T; data: D extends object ? Readonly<D> : D };
+
+	type Messages<T> = { [P in keyof T]: P extends string ? DataMessage<P, T[P]> : never }[keyof T];
+
+	export interface ClientMessageMap {
+		ready: undefined;
+		fetch: {
+			offset: number;
+			byteLength: number;
+		};
+	}
+
+	export type ClientMessage = Messages<ClientMessageMap>;
+
+	export interface HostMessageMap {
+		stat: {
+			fileSize: number;
+		};
+		bytes: {
+			offset: number;
+			buffer: ArrayBuffer;
+		};
+	}
+
+	export type HostMessage = Messages<HostMessageMap>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare

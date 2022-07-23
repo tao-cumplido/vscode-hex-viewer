@@ -2,34 +2,43 @@
 
 import './style.css';
 
-import type { DecoderResult } from '@hex/types';
+import type { HostMessage } from '@hex/types';
 
 import { handleByteData } from './handle-byte-data';
-import { handleTextData } from './handle-text-data';
-import { render } from './render';
-import { header, headerItems, updateRowHeight } from './state';
+import { hex } from './hex';
+import { throttledRender } from './render';
+import { header, headerItems, headerOffsetSpacer, stat, updateRowHeight } from './state';
 import { vscode } from './vscode';
 
-interface DataMessage<T extends string, D> {
-	type: T;
-	data: D;
+declare global {
+	interface WindowEventMap {
+		message: MessageEvent<HostMessage>;
+	}
 }
 
-type HostMessage = DataMessage<'bytes', ArrayBuffer> | DataMessage<'text', null | DecoderResult>;
-
-header.append(...headerItems.flatMap(({ byte, text }) => [byte, text]));
+header.append(headerOffsetSpacer, ...headerItems.flatMap(({ byte, text }) => [byte, text]));
 
 updateRowHeight();
 
-window.addEventListener('scroll', render);
+window.addEventListener('scroll', throttledRender);
 
-window.addEventListener('message', ({ data: message }: MessageEvent<HostMessage>) => {
+window.addEventListener('message', ({ data: message }) => {
 	switch (message.type) {
-		case 'bytes':
+		case 'stat': {
+			const hexDigitCount = message.data.fileSize.toString(16).length;
+			stat.offsetHexDigitCount = hexDigitCount + (hexDigitCount % 2);
+			stat.fileSize = message.data.fileSize;
+			stat.fileRows = Math.ceil(message.data.fileSize / 0x10);
+			document.body.style.height = `calc(${stat.fileRows + 1} * var(--row-height))`;
+			headerOffsetSpacer.textContent = hex(0, stat.offsetHexDigitCount);
+			return throttledRender();
+		}
+		case 'bytes': {
 			return handleByteData(message.data);
-		case 'text':
-			return handleTextData(message.data);
+		}
+		// case 'text':
+		// 	return handleTextData(message.data);
 	}
 });
 
-vscode.postMessage('ready');
+vscode.postMessage({ type: 'ready' });

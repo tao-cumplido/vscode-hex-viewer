@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import type { HostMessageMap } from '@hex/types';
+
 import { createElement } from './create-element';
 import { hex } from './hex';
-import { render } from './render';
-import { byteRelations, dataRows, headerItems, listeners, textRelations } from './state';
+import { throttledRender } from './render';
+import { byteRelations, data, flags, headerItems, listeners, stat, textRelations } from './state';
 import { gridColumn, y } from './style';
 
-export function handleByteData(data: ArrayBuffer): void {
-	const bytes = new Uint8Array(data);
+export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): void {
+	flags.fetchInProgress = false;
 
-	const hexLength = bytes.length.toString(16).length;
-	const offsetPad = hexLength + (hexLength % 2);
+	const bytes = new Uint8Array(buffer);
 
 	listeners.forEach((listener, element) => {
 		listener.forEach((callback, event) => element.removeEventListener(event, callback));
@@ -18,27 +19,34 @@ export function handleByteData(data: ArrayBuffer): void {
 	byteRelations.clear();
 	textRelations.clear();
 
-	bytes.forEach((byte, offset) => {
-		const column = offset % 0x10;
-		const index = Math.floor(offset / 0x10);
+	data.offset = offset;
+	data.byteLength = bytes.byteLength;
+	data.rows = [];
 
-		const row = dataRows[index] ?? {
+	const dataStartIndex = data.offset / 0x10;
+
+	bytes.forEach((byte, byteIndex) => {
+		const byteOffset = offset + byteIndex;
+		const columnIndex = byteOffset % 0x10;
+		const rowIndex = Math.floor(byteOffset / 0x10);
+
+		const row = data.rows[rowIndex - dataStartIndex] ?? {
 			offset: createElement('div', {
 				classList: ['cell', 'offset'],
-				style: y(index),
-				content: hex(index * 0x10, offsetPad),
+				style: y(rowIndex),
+				content: hex(rowIndex * 0x10, stat.offsetHexDigitCount),
 			}),
 			bytes: [],
 			text: [],
 		};
 
-		dataRows[index] = row;
+		data.rows[rowIndex - dataStartIndex] = row;
 
 		const cell = createElement('div', {
 			classList: ['cell'],
 			style: {
-				...y(index),
-				...gridColumn('byte', offset),
+				...y(rowIndex),
+				...gridColumn('byte', byteOffset),
 			},
 			content: hex(byte),
 		});
@@ -93,7 +101,7 @@ export function handleByteData(data: ArrayBuffer): void {
 
 		byteRelations.set(cell, {
 			row: row.offset,
-			column: headerItems[column]!.byte,
+			column: headerItems[columnIndex]!.byte,
 			weak: [],
 			text: {
 				columns: [],
@@ -104,5 +112,10 @@ export function handleByteData(data: ArrayBuffer): void {
 		row.bytes.push(cell);
 	});
 
-	render();
+	headerItems.forEach(({ byte, text }) => {
+		byte.classList.remove('highlight');
+		text.classList.remove('highlight');
+	});
+
+	throttledRender();
 }

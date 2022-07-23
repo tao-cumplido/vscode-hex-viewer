@@ -9,7 +9,8 @@
 		"watch:browser": "npm run esbuild:browser -- --sourcemap --watch"
 	},
 	"browser": {
-		"src/custom-decoders/index.ts": "./src/custom-decoders/browser.ts"
+		"src/custom-decoders/index.ts": "./src/custom-decoders/browser.ts",
+		"src/binary-document/index.ts": "./src/binary-document/browser.ts"
 	},
 	"dependencies": {
 		"clear-module": "4.1.2"
