@@ -1,7 +1,7 @@
 body {
 	--scrollbar-size-vertical: 0;
 	--scrollbar-size-horizontal: 0;
-	--content-translate: 0;
+	--content-translate: 0px;
 	--row-height: 2em;
 	width: 100vw;
 	height: 100vh;
