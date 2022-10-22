@@ -40,10 +40,11 @@ declare namespace module {
 
 	export interface ClientMessageMap {
 		ready: undefined;
-		fetch: {
+		fetchBytes: {
 			offset: number;
 			byteLength: number;
 		};
+		fetchText: undefined;
 	}
 
 	export type ClientMessage = Messages<ClientMessageMap>;
@@ -56,6 +57,7 @@ declare namespace module {
 			offset: number;
 			buffer: ArrayBuffer;
 		};
+		text: DecoderResult | null;
 	}
 
 	export type HostMessage = Messages<HostMessageMap>;

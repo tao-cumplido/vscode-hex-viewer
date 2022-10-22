@@ -1,5 +1,4 @@
 import type { Event, Webview } from 'vscode';
-import { window, ProgressLocation } from 'vscode';
 
 import type { ClientMessage, ClientMessageMap, HostMessage } from '@hex/types';
 
@@ -12,6 +11,9 @@ interface TypedWebview<R, P> extends Webview {
 }
 
 export class ViewState {
+	private offset = 0;
+	private buffer = new Uint8Array();
+
 	readonly webview: TypedWebview<ClientMessage, HostMessage>;
 	readonly document: BinaryDocument;
 
@@ -27,8 +29,10 @@ export class ViewState {
 			switch (message.type) {
 				case 'ready':
 					return this.handleReady();
-				case 'fetch':
-					return this.handleFetch(message.data);
+				case 'fetchBytes':
+					return this.handleFetchBytes(message.data);
+				case 'fetchText':
+					return this.handleFetchText();
 			}
 		});
 	}
@@ -42,20 +46,20 @@ export class ViewState {
 		});
 	}
 
-	async handleFetch({ offset, byteLength }: ClientMessageMap['fetch']): Promise<unknown> {
-		return window.withProgress({ location: ProgressLocation.Window, title: 'Loading data...' }, async () => {
-			const buffer = await this.document.read(offset, byteLength);
-			await this.webview.postMessage({
-				type: 'bytes',
-				data: { offset, buffer: buffer.buffer.slice(buffer.byteOffset, buffer.byteLength) },
-			});
-		});
+	async handleFetchBytes({ offset, byteLength }: ClientMessageMap['fetchBytes']): Promise<void> {
+		this.offset = offset;
+		this.buffer = await this.document.read(offset, byteLength);
 
-		// return window.withProgress({ location: ProgressLocation.Window }, async () => {
-		// 	return this.webview.postMessage({
-		// 		type: 'text',
-		// 		data: await this.document.decodeWith(this.decoderItem.decoder, offset, bytes),
-		// 	});
-		// });
+		await this.webview.postMessage({
+			type: 'bytes',
+			data: { offset, buffer: this.buffer.buffer.slice(this.buffer.byteOffset, this.buffer.byteLength) },
+		});
+	}
+
+	async handleFetchText(): Promise<void> {
+		await this.webview.postMessage({
+			type: 'text',
+			data: await this.document.decodeWith(this.decoderItem.decoder, this.offset, this.buffer),
+		});
 	}
 }

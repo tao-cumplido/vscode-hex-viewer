@@ -1,7 +1,7 @@
 export interface CreateElementData {
 	classList?: string[];
 	style?: Record<string, string>;
-	content?: string | Element;
+	content?: string | Element | Element[];
 }
 
 export function createElement<T extends keyof HTMLElementTagNameMap>(
@@ -22,6 +22,8 @@ export function createElement<T extends keyof HTMLElementTagNameMap>(
 
 	if (typeof data?.content === 'string') {
 		element.textContent = data.content;
+	} else if (data?.content instanceof Array) {
+		element.append(...data.content);
 	} else if (data?.content) {
 		element.appendChild(data.content);
 	}

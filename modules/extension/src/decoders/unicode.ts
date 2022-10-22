@@ -12,7 +12,7 @@ export function unicode(type: DataChar): Decoder {
 
 		const values = [];
 
-		while (reader.hasNext) {
+		while (reader.hasNext()) {
 			try {
 				const { value, byteLength } = reader.next(type);
 

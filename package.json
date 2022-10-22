@@ -128,8 +128,8 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"@nishin/async-reader": "0.1.4",
-		"@nishin/reader": "0.1.6",
+		"@nishin/async-reader": "0.2.1",
+		"@nishin/reader": "0.2.1",
 		"@vscode/webview-ui-toolkit": "0.9.0"
 	},
 	"devDependencies": {

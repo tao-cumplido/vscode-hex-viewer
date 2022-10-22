@@ -23,7 +23,7 @@ function reloadDecoders() {
 		const item = state.decoderItems.find(({ label }) => label === view.decoderItem.label);
 		view.decoderItem = item ?? defaultDecoder;
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		view.updateDecodedData();
+		view.handleFetchText();
 	});
 }
 
@@ -62,7 +62,7 @@ export function activate(context: ExtensionContext): void {
 			if (item && state.activeView) {
 				state.activeDecoderStatusItem.text = item.label;
 				state.activeView.decoderItem = item;
-				await state.activeView.updateDecodedData();
+				await state.activeView.handleFetchText();
 			}
 		}),
 	);

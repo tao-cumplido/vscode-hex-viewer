@@ -1,58 +1,120 @@
 body {
+	--scrollbar-size-vertical: 0;
+	--scrollbar-size-horizontal: 0;
+	--content-translate: 0;
 	--row-height: 2em;
+	width: 100vw;
+	height: 100vh;
 	font-family: var(--vscode-editor-font-family);
 	user-select: none;
+	overflow: hidden;
+	padding: 0;
+}
+
+.viewport {
+	width: fit-content;
 	place-self: start;
 	display: grid;
 	grid: repeat(2, var(--row-height)) / [offset] auto 0.3rem repeat(16, [byte] auto) 1rem repeat(16, [text] auto) [end];
 	place-content: start;
+	padding: 0 20px;
 }
 
-header,
-main {
-	display: contents;
-}
-
-header > * {
-	grid-row: 1 / span 1;
-	position: sticky;
-	top: 0;
-}
-
-header > .background {
-	grid-column: 1 / end;
+.scrollbar {
+	position: fixed;
 	background: var(--vscode-editor-background);
 	z-index: 100;
 }
 
-header > .progress {
+.scrollbar .handle {
+	background: var(--vscode-scrollbarSlider-background);
+	position: absolute;
+}
+
+.scrollbar .handle:hover {
+	background: var(--vscode-scrollbarSlider-hoverBackground);
+}
+
+.scrollbar .handle.active {
+	background: var(--vscode-scrollbarSlider-activeBackground);
+}
+
+.scrollbar.vertical {
+	width: var(--scrollbar-size-vertical);
+	bottom: var(--scrollbar-size-horizontal);
+	top: 0;
+	right: 0;
+}
+
+.scrollbar.horizontal {
+	height: var(--scrollbar-size-horizontal);
+	right: var(--scrollbar-size-vertical);
+	bottom: 0;
+	left: 0;
+}
+
+.scrollbar.vertical .handle {
+	width: var(--scrollbar-size-vertical);
+}
+
+.scrollbar.horizontal .handle {
+	height: var(--scrollbar-size-horizontal);
+}
+
+.scrollbar.corner {
+	width: var(--scrollbar-size-vertical);
+	height: var(--scrollbar-size-horizontal);
+	bottom: 0;
+	right: 0;
+}
+
+.container,
+header,
+section {
+	display: contents;
+}
+
+header.column > * {
+	grid-row: 1 / span 1;
+}
+
+header.column > .background {
+	grid-column: 1 / end;
+	background: var(--vscode-editor-background);
+	z-index: 1;
+}
+
+header.column > .progress {
 	--design-unit: 3;
 	grid-column: offset / span 1;
 	display: grid;
-	z-index: 200;
 	place-items: center;
+	visibility: hidden;
+	z-index: 2;
 }
 
-header > .spacer {
+header.column > .spacer {
 	grid-column: offset / span 1;
 	visibility: hidden;
 }
 
-header > .cell {
-	z-index: 200;
+header.column > .cell {
+	z-index: 2;
 }
 
-main > * {
-	grid-row: 2 / span 1;
-	transform: translateY(var(--y));
-}
-
-main > .offset {
+header.row > * {
 	grid-column: offset / span 1;
+}
+
+header.row > *,
+section > * {
+	grid-row: 2 / span 1;
+	transform: translateY(calc(var(--row-index) * var(--row-height) + var(--content-translate)));
 }
 
 .cell {
 	padding: 0.3em 0.3rem;
+	background: var(--vscode-editor-background);
 }
 
 .offset {

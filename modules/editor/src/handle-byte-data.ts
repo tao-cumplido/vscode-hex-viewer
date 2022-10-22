@@ -1,60 +1,52 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { HostMessageMap } from '@hex/types';
 
+import { assert } from './assert';
 import { createElement } from './create-element';
 import { hex } from './hex';
-import { throttledRender } from './render';
-import { byteRelations, data, flags, headerItems, listeners, stat, textRelations } from './state';
-import { gridColumn, y } from './style';
+import { data, headerItems } from './state';
+import { gridColumn } from './style';
+import { vscode } from './vscode';
 
 export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): void {
-	flags.fetchInProgress = false;
-
 	const bytes = new Uint8Array(buffer);
 
-	listeners.forEach((listener, element) => {
-		listener.forEach((callback, event) => element.removeEventListener(event, callback));
+	headerItems.forEach(({ byte, text }) => {
+		byte.classList.remove('highlight');
+		text.classList.remove('highlight');
 	});
 
-	byteRelations.clear();
-	textRelations.clear();
+	const fragment = document.createDocumentFragment();
 
-	data.offset = offset;
-	data.byteLength = bytes.byteLength;
-	data.rows = [];
+	const { byteRelations, textRelations } = data;
 
-	const dataStartIndex = data.offset / 0x10;
-
-	bytes.forEach((byte, byteIndex) => {
+	for (let byteIndex = 0; byteIndex < bytes.length; byteIndex++) {
 		const byteOffset = offset + byteIndex;
-		const columnIndex = byteOffset % 0x10;
 		const rowIndex = Math.floor(byteOffset / 0x10);
+		const row = data.rows.get(rowIndex);
 
-		const row = data.rows[rowIndex - dataStartIndex] ?? {
-			offset: createElement('div', {
-				classList: ['cell', 'offset'],
-				style: y(rowIndex),
-				content: hex(rowIndex * 0x10, stat.offsetHexDigitCount),
-			}),
-			bytes: [],
-			text: [],
-		};
+		if (!row?.offset) {
+			return;
+		}
 
-		data.rows[rowIndex - dataStartIndex] = row;
+		const byte = assert.return(bytes[byteIndex]);
+		const columnIndex = byteOffset % 0x10;
 
 		const cell = createElement('div', {
 			classList: ['cell'],
 			style: {
-				...y(rowIndex),
+				'--row-index': `${rowIndex}`,
 				...gridColumn('byte', byteOffset),
 			},
 			content: hex(byte),
 		});
 
+		row.bytes.push(cell);
+		fragment.appendChild(cell);
+
 		const listener = new Map<string, () => unknown>();
 
 		listener.set('mouseenter', () => {
-			const relations = byteRelations.get(cell)!;
+			const relations = assert.return(byteRelations.get(cell));
 
 			relations.weak.forEach((element) => {
 				element.classList.add('shadow');
@@ -66,7 +58,7 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 		});
 
 		listener.set('mouseleave', () => {
-			const relations = byteRelations.get(cell)!;
+			const relations = assert.return(byteRelations.get(cell));
 
 			relations.weak.forEach((element) => {
 				element.classList.remove('shadow');
@@ -78,12 +70,12 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 		});
 
 		listener.set('mousedown', () => {
-			const relations = byteRelations.get(cell)!;
+			const relations = assert.return(byteRelations.get(cell));
 
 			cell.classList.toggle('selected');
 
 			relations.text.unit.forEach((element) => {
-				const textRelation = textRelations.get(element)!;
+				const textRelation = assert.return(textRelations.get(element));
 
 				const selected = textRelation.bytes.some((byteCell) => byteCell.classList.contains('selected'));
 
@@ -97,25 +89,20 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 
 		listener.forEach((callback, event) => cell.addEventListener(event, callback));
 
-		listeners.set(cell, listener);
+		data.listeners.set(cell, listener);
 
-		byteRelations.set(cell, {
+		data.byteRelations.set(cell, {
 			row: row.offset,
-			column: headerItems[columnIndex]!.byte,
+			column: assert.return(headerItems[columnIndex]).byte,
 			weak: [],
 			text: {
 				columns: [],
 				unit: [],
 			},
 		});
+	}
 
-		row.bytes.push(cell);
-	});
+	vscode.postMessage({ type: 'fetchText' });
 
-	headerItems.forEach(({ byte, text }) => {
-		byte.classList.remove('highlight');
-		text.classList.remove('highlight');
-	});
-
-	throttledRender();
+	data.bytesSection.appendChild(fragment);
 }

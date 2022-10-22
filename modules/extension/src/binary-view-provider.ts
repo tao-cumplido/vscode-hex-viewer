@@ -55,13 +55,21 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 					<link rel="stylesheet" href="${styleUri}">
 				</head>
 				<body>
-					<header>
-						<div class="background"></div>
-						<div class="progress">
-							<vscode-progress-ring></vscode-progress-ring>
-						</div>
-					</header>
-					<main></main>
+					<div class="viewport">
+						<header class="column">
+							<div class="background"></div>
+							<div class="progress">
+								<vscode-progress-ring></vscode-progress-ring>
+							</div>
+						</header>
+					</div>
+					<div class="scrollbar vertical">
+						<div class="handle"></div>
+					</div>
+					<div class="scrollbar horizontal">
+						<div class="handle"></div>
+					</div>
+					<div class="scrollbar corner"></div>
 				</body>
 			</html>
 		`;
