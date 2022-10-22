@@ -47,14 +47,14 @@ function scrollY(top: number): void {
 	const topMax = viewportHeight - yHandleHeight;
 	scrollTop = Math.max(0, Math.min(top, viewportHeight - yHandleHeight));
 	scrollFactorY = (scrollTop + (scrollTop / topMax) * (yHandleHeight - yHandleReal)) / viewportHeight;
-	document.body.style.setProperty('--content-translate', `-${(contentHeight + rowHeight) * scrollFactorY}px`);
+	document.body.style.setProperty('--content-translate', `-${contentHeight * scrollFactorY}px`);
 	scrollHandleY.style.top = `${scrollTop}px`;
 	window.dispatchEvent(new CustomEvent('content-scroll'));
 }
 
 export function updateScrollHandle(entries?: readonly ResizeObserverEntry[]): void {
 	viewportHeight = entries?.[0]?.contentRect.height ?? scrollBarY.getBoundingClientRect().height;
-	contentHeight = stat.fileRows * rowHeight;
+	contentHeight = (stat.fileRows + 1) * rowHeight;
 
 	if (contentHeight < viewportHeight) {
 		document.body.style.removeProperty('--scrollbar-size-vertical');
@@ -63,8 +63,6 @@ export function updateScrollHandle(entries?: readonly ResizeObserverEntry[]): vo
 		yHandleReal = viewportHeight ** 2 / contentHeight;
 		yHandleHeight = Math.max(handleMinimum, yHandleReal);
 		scrollHandleY.style.height = `${yHandleHeight}px`;
-		// scrollTop = scrollFactorY * viewportHeight;
-		// scrollHandleY.style.top = `${scrollTop}px`;
 		scrollY(scrollFactorY * viewportHeight);
 	}
 }
