@@ -11,19 +11,28 @@ export function createElement<T extends keyof HTMLElementTagNameMap>(
 	const element = document.createElement(name);
 
 	if (data?.classList) {
-		element.classList.add(...data.classList.filter(Boolean));
+		for (const className of data.classList) {
+			if (className) {
+				element.classList.add(className);
+			}
+		}
 	}
 
 	if (data?.style) {
-		Object.entries(data.style).forEach(([property, value]) => {
-			element.style.setProperty(property, value);
-		});
+		for (const property in data.style) {
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			element.style.setProperty(property, data.style[property]!);
+		}
 	}
 
 	if (typeof data?.content === 'string') {
 		element.textContent = data.content;
 	} else if (data?.content instanceof Array) {
-		element.append(...data.content);
+		const fragment = document.createDocumentFragment();
+		for (const child of data.content) {
+			fragment.appendChild(child);
+		}
+		element.appendChild(fragment);
 	} else if (data?.content) {
 		element.appendChild(data.content);
 	}

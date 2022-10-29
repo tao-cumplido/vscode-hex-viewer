@@ -42,6 +42,7 @@ window.addEventListener('message', ({ data: message }) => {
 			headerOffsetSpacer.textContent = hex(0, stat.offsetHexDigitCount);
 
 			updateScrollHandle();
+
 			return render();
 		}
 		case 'bytes': {

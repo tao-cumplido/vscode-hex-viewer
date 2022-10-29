@@ -12,75 +12,106 @@ function updateTextRelations(
 	textCells: HTMLElement[],
 	byteCells: HTMLElement[],
 ) {
-	byteCells.forEach((cell) => {
+	for (const cell of byteCells) {
 		const relations = assert.return(data.byteRelations.get(cell));
 
-		relations.weak.push(
-			...byteCells.filter((item) => item !== cell),
-			...columns.map(({ byte }) => byte),
-			...rows.filter(({ bytes }) => !bytes.includes(cell)).map(({ offset }) => assert.return(offset)),
-		);
+		for (const item of byteCells) {
+			if (item !== cell) {
+				relations.weak.push(item);
+			}
+		}
 
-		relations.text.columns.push(...columns.map(({ text }) => text));
+		for (const { byte } of columns) {
+			relations.weak.push(byte);
+		}
+
+		for (const { bytes, offset } of rows) {
+			if (!bytes.includes(cell) && offset) {
+				relations.weak.push(offset);
+			}
+		}
+
+		for (const { text } of columns) {
+			relations.text.columns.push(text);
+		}
+
 		relations.text.unit.push(...textCells);
-	});
+	}
 
 	const { textRelations } = data;
 
-	textCells.forEach((cell) => {
+	for (const cell of textCells) {
 		const listener = new Map<string, () => unknown>();
 
 		listener.set('mouseenter', () => {
 			const relations = assert.return(textRelations.get(cell));
 
-			[...relations.rows, ...relations.columns, ...relations.bytes, ...relations.text].forEach((element) => {
+			for (const element of [...relations.rows, ...relations.columns, ...relations.bytes, ...relations.text]) {
 				element.classList.add('highlight');
-			});
+			}
 		});
 
 		listener.set('mouseleave', () => {
 			const relations = assert.return(textRelations.get(cell));
 
-			[...relations.rows, ...relations.columns, ...relations.bytes, ...relations.text].forEach((element) => {
+			for (const element of [...relations.rows, ...relations.columns, ...relations.bytes, ...relations.text]) {
 				element.classList.remove('highlight');
-			});
+			}
 		});
 
 		listener.set('mousedown', () => {
 			const relations = assert.return(textRelations.get(cell));
 
-			relations.text.forEach((element) => element.classList.toggle('selected'));
+			for (const element of relations.text) {
+				element.classList.toggle('selected');
+			}
 
-			relations.bytes.forEach((element) => {
+			for (const element of relations.bytes) {
 				if (cell.classList.contains('selected')) {
 					element.classList.add('selected');
 				} else {
 					element.classList.remove('selected');
 				}
-			});
+			}
 		});
 
-		listener.forEach((callback, event) => cell.addEventListener(event, callback));
+		for (const [event, callback] of listener) {
+			cell.addEventListener(event, callback);
+		}
 
 		data.listeners.set(cell, listener);
 
+		const resultRows: HTMLElement[] = [];
+		const resultColumns: HTMLElement[] = [];
+
+		for (const { offset } of rows) {
+			if (offset) {
+				resultRows.push(offset);
+			}
+		}
+
+		for (const { byte, text } of columns) {
+			resultColumns.push(byte, text);
+		}
+
 		data.textRelations.set(cell, {
-			rows: rows.flatMap(({ offset }) => (offset ? [offset] : [])),
-			columns: columns.flatMap(({ byte, text }) => [byte, text]),
+			rows: resultRows,
+			columns: resultColumns,
 			bytes: byteCells,
 			text: textCells,
 		});
-	});
+	}
 }
 
 export function handleTextData(result: null | DecoderResult): void {
 	data.textRelations.clear();
 
-	data.byteRelations.forEach((relations) => {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention
+	for (const [_, relations] of data.byteRelations) {
 		relations.weak.length = 0;
 		relations.text.columns.length = 0;
 		relations.text.unit.length = 0;
-	});
+	}
 
 	const fragment = document.createDocumentFragment();
 
@@ -89,7 +120,7 @@ export function handleTextData(result: null | DecoderResult): void {
 
 		let offset = startOffset;
 
-		values.forEach((value) => {
+		for (const value of values) {
 			const columnIndex = offset % 0x10;
 			const rowIndex = Math.floor(offset / 0x10);
 			const row = data.rows.get(rowIndex) ?? { bytes: [], text: [] };
@@ -125,9 +156,9 @@ export function handleTextData(result: null | DecoderResult): void {
 					let cell = createElement('div', {
 						classList: ['cell', value.text ? '' : 'empty'],
 						style: {
+							...value.style,
 							'--row-index': `${rowIndex}`,
 							...gridColumn('text', offset, start),
-							...value.style,
 						},
 						content: value.text ?? '.',
 					});
@@ -159,14 +190,18 @@ export function handleTextData(result: null | DecoderResult): void {
 					textCells.push(cell);
 					fragment.appendChild(cell);
 
-					const rows = [...data.rows].flatMap(([index, dataRow]) =>
-						index >= rowIndex && index <= lastIndex ? [dataRow] : [],
-					);
+					const rows: DataRow[] = [];
+
+					for (const [index, dataRow] of data.rows) {
+						if (index >= rowIndex && index <= lastIndex) {
+							rows.push(dataRow);
+						}
+					}
 
 					const headerCells =
 						textCells.length > 2 ? headerItems : [...headerItems.slice(0, end), ...headerItems.slice(columnIndex)];
 
-					const byteCells = rows.flatMap(({ bytes }, rowN, source) => {
+					const byteCells: HTMLElement[] = rows.flatMap(({ bytes }, rowN, source) => {
 						if (rowN === 0) {
 							return bytes.slice(columnIndex);
 						}
@@ -183,9 +218,9 @@ export function handleTextData(result: null | DecoderResult): void {
 					const cell = createElement('div', {
 						classList: ['cell', value.text ? '' : 'empty'],
 						style: {
+							...value.style,
 							'--row-index': `${rowIndex}`,
 							...gridColumn('text', offset, length),
-							...value.style,
 						},
 						content: value.text ?? '.',
 					});
@@ -201,7 +236,7 @@ export function handleTextData(result: null | DecoderResult): void {
 
 				offset += length;
 			}
-		});
+		}
 	}
 
 	data.textSection.replaceChildren(fragment);

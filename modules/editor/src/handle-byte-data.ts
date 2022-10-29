@@ -10,10 +10,10 @@ import { vscode } from './vscode';
 export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): void {
 	const bytes = new Uint8Array(buffer);
 
-	headerItems.forEach(({ byte, text }) => {
+	for (const { byte, text } of headerItems) {
 		byte.classList.remove('highlight');
 		text.classList.remove('highlight');
-	});
+	}
 
 	const fragment = document.createDocumentFragment();
 
@@ -28,7 +28,8 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 			return;
 		}
 
-		const byte = assert.return(bytes[byteIndex]);
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const byte = bytes[byteIndex]!;
 		const columnIndex = byteOffset % 0x10;
 
 		const cell = createElement('div', {
@@ -48,25 +49,25 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 		listener.set('mouseenter', () => {
 			const relations = assert.return(byteRelations.get(cell));
 
-			relations.weak.forEach((element) => {
+			for (const element of relations.weak) {
 				element.classList.add('shadow');
-			});
+			}
 
-			[cell, relations.row, relations.column, ...relations.text.columns, ...relations.text.unit].forEach((element) => {
+			for (const element of [cell, relations.row, relations.column, ...relations.text.columns, ...relations.text.unit]) {
 				element.classList.add('highlight');
-			});
+			}
 		});
 
 		listener.set('mouseleave', () => {
 			const relations = assert.return(byteRelations.get(cell));
 
-			relations.weak.forEach((element) => {
+			for (const element of relations.weak) {
 				element.classList.remove('shadow');
-			});
+			}
 
-			[cell, relations.row, relations.column, ...relations.text.columns, ...relations.text.unit].forEach((element) => {
+			for (const element of [cell, relations.row, relations.column, ...relations.text.columns, ...relations.text.unit]) {
 				element.classList.remove('highlight');
-			});
+			}
 		});
 
 		listener.set('mousedown', () => {
@@ -74,7 +75,7 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 
 			cell.classList.toggle('selected');
 
-			relations.text.unit.forEach((element) => {
+			for (const element of relations.text.unit) {
 				const textRelation = assert.return(textRelations.get(element));
 
 				const selected = textRelation.bytes.some((byteCell) => byteCell.classList.contains('selected'));
@@ -84,10 +85,12 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 				} else {
 					element.classList.remove('selected');
 				}
-			});
+			}
 		});
 
-		listener.forEach((callback, event) => cell.addEventListener(event, callback));
+		for (const [event, callback] of listener) {
+			cell.addEventListener(event, callback);
+		}
 
 		data.listeners.set(cell, listener);
 

@@ -40,11 +40,11 @@ export interface Data {
 export let data!: Data;
 
 const cleanup = throttle(() => {
-	viewport.querySelectorAll('.container').forEach((element) => {
+	for (const element of viewport.querySelectorAll('.container')) {
 		if (element !== data.container) {
 			element.remove();
 		}
-	});
+	}
 }, 1000);
 
 export function resetData(): Data {
