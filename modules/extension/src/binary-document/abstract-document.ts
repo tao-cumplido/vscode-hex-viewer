@@ -44,20 +44,6 @@ export abstract class AbstractDocument<T extends FileHandle | undefined> impleme
 				return null;
 			}
 
-			// const byteLength = result.values.reduce((n, value) => {
-			// 	if (typeof value === 'string' || value === null) {
-			// 		return n + 1;
-			// 	}
-
-			// 	return n + (value.length ?? 1);
-			// }, 0);
-
-			// if (byteLength > data.length) {
-			// 	return null;
-			// }
-
-			// result.push(...Array.from<null>({ length: data.length - byteLength }).fill(null));
-
 			return result;
 		} catch (error) {
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
