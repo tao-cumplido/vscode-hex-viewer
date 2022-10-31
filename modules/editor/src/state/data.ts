@@ -27,6 +27,7 @@ export interface TextRelation {
 
 export interface Data {
 	container: HTMLElement;
+	placeholders: HTMLElement;
 	header: HTMLElement;
 	bytesSection: HTMLElement;
 	textSection: HTMLElement;
@@ -65,6 +66,9 @@ export function resetData(): Data {
 			classList: ['container'],
 			content: [header, bytesSection, textSection],
 		}),
+		placeholders: createElement('div', {
+			classList: ['placeholders'],
+		}),
 		header,
 		bytesSection,
 		textSection,
@@ -74,7 +78,7 @@ export function resetData(): Data {
 		rows: new Map(),
 	};
 
-	viewport.appendChild(data.container);
+	viewport.append(data.container, data.placeholders);
 
 	cleanup();
 

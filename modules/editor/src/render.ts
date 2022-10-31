@@ -1,6 +1,7 @@
 import { createElement } from './create-element';
 import { hex } from './hex';
 import { contentHeight, data, progress, resetData, rowHeight, scrollFactorY, stat, viewportHeight } from './state';
+import { gridColumn } from './style';
 import { vscode } from './vscode';
 
 let debounceTimer = 0;
@@ -27,7 +28,8 @@ export function render(): void {
 
 		resetData();
 
-		const fragment = document.createDocumentFragment();
+		const headerFragment = document.createDocumentFragment();
+		const placeholdersFragment = document.createDocumentFragment();
 
 		for (let rowIndex = renderStartIndex; rowIndex < renderEndIndex; rowIndex++) {
 			const cell = createElement('div', {
@@ -40,10 +42,32 @@ export function render(): void {
 
 			data.rows.set(rowIndex, { offset: cell, bytes: [], text: [] });
 
-			fragment.appendChild(cell);
+			headerFragment.appendChild(cell);
+
+			for (let i = 0; stat.fileRows - 1 === rowIndex ? i < stat.fileSize % 0x10 : i < 0x10; i++) {
+				placeholdersFragment.appendChild(
+					createElement('div', {
+						style: {
+							'--row-index': `${rowIndex}`,
+							...gridColumn('byte', i),
+						},
+						content: createElement('div'),
+					}),
+				);
+				placeholdersFragment.appendChild(
+					createElement('div', {
+						style: {
+							'--row-index': `${rowIndex}`,
+							...gridColumn('text', i),
+						},
+						content: createElement('div'),
+					}),
+				);
+			}
 		}
 
-		data.header.appendChild(fragment);
+		data.header.appendChild(headerFragment);
+		data.placeholders.appendChild(placeholdersFragment);
 
 		clearTimeout(debounceTimer);
 

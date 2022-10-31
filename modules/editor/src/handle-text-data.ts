@@ -3,8 +3,15 @@ import type { DecoderResult } from '@hex/types';
 import type { DataRow, HeaderItem } from './state';
 import { assert } from './assert';
 import { createElement } from './create-element';
-import { data, headerItems } from './state';
+import { data, headerItems, viewport } from './state';
 import { gridColumn } from './style';
+import { throttle } from './throttle';
+
+const cleanup = throttle(() => {
+	for (const element of viewport.querySelectorAll('.placeholders')) {
+		element.remove();
+	}
+}, 100);
 
 function updateTextRelations(
 	rows: DataRow[],
@@ -240,4 +247,6 @@ export function handleTextData(result: null | DecoderResult): void {
 	}
 
 	data.textSection.replaceChildren(fragment);
+
+	cleanup();
 }

@@ -1,4 +1,9 @@
 body {
+	--z-layer-scrollbar: 100;
+	--z-layer-header: 3;
+	--z-layer-header-bg: 2;
+	--z-layer-content: 1;
+	--z-layer-placeholder: 0;
 	--scrollbar-size-vertical: 0;
 	--scrollbar-size-horizontal: 0;
 	--content-translate: 0px;
@@ -17,13 +22,14 @@ body {
 	display: grid;
 	grid: repeat(2, var(--row-height)) / [offset] auto 0.3rem repeat(16, [byte] auto) 1rem repeat(16, [text] auto) [end];
 	place-content: start;
+	align-items: center;
 	padding: 0 20px;
 }
 
 .scrollbar {
 	position: fixed;
 	background: var(--vscode-editor-background);
-	z-index: 100;
+	z-index: var(--z-layer-scrollbar);
 }
 
 .scrollbar .handle {
@@ -69,6 +75,7 @@ body {
 }
 
 .container,
+.placeholders,
 header,
 section {
 	display: contents;
@@ -79,9 +86,10 @@ header.column > * {
 }
 
 header.column > .background {
+	align-self: stretch;
 	grid-column: 1 / end;
 	background: var(--vscode-editor-background);
-	z-index: 1;
+	z-index: var(--z-layer-header-bg);
 }
 
 header.column > .progress {
@@ -90,7 +98,7 @@ header.column > .progress {
 	display: grid;
 	place-items: center;
 	visibility: hidden;
-	z-index: 2;
+	z-index: var(--z-layer-header);
 }
 
 header.column > .spacer {
@@ -99,7 +107,7 @@ header.column > .spacer {
 }
 
 header.column > .cell {
-	z-index: 2;
+	z-index: var(--z-layer-header);
 }
 
 header.row > * {
@@ -107,14 +115,29 @@ header.row > * {
 }
 
 header.row > *,
-section > * {
+section > *,
+.placeholders > div {
 	grid-row: 2 / span 1;
 	transform: translateY(calc(var(--row-index) * var(--row-height) + var(--content-translate)));
+}
+
+.placeholders > div {
+	place-self: center;
+	background: var(--vscode-editor-background);
+	z-index: var(--z-layer-placeholder);
+}
+
+.placeholders > div > div {
+	width: calc(var(--row-height) / 3);
+	aspect-ratio: 1;
+	border-radius: 50%;
+	background: var(--vscode-editorGhostText-foreground);
 }
 
 .cell {
 	padding: 0.3em 0.3rem;
 	background: var(--vscode-editor-background);
+	z-index: var(--z-layer-content);
 }
 
 .offset {
