@@ -62,6 +62,12 @@ export class BinaryViewProvider implements CustomReadonlyEditorProvider<BinaryDo
 								<vscode-progress-ring></vscode-progress-ring>
 							</div>
 						</header>
+						<div class="progress section bytes">
+							<vscode-progress-ring></vscode-progress-ring>
+						</div>
+						<div class="progress section text">
+							<vscode-progress-ring></vscode-progress-ring>
+						</div>
 					</div>
 					<div class="scrollbar vertical">
 						<div class="handle"></div>

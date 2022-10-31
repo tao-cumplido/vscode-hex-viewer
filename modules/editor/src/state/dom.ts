@@ -10,7 +10,9 @@ export interface HeaderItem {
 
 export const viewport = assert.return(document.querySelector<HTMLElement>('.viewport'));
 export const columnHeader = assert.return(viewport.querySelector<HTMLElement>('header.column'));
-export const progress = assert.return(columnHeader.querySelector<HTMLElement>('.progress'));
+export const headerProgress = assert.return(columnHeader.querySelector<HTMLElement>('.progress'));
+export const bytesProgress = assert.return(viewport.querySelector<HTMLElement>('.progress.bytes'));
+export const textProgress = assert.return(viewport.querySelector<HTMLElement>('.progress.text'));
 
 export const headerOffsetSpacer = createElement('div', {
 	classList: ['spacer', 'cell'],

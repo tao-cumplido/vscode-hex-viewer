@@ -9,11 +9,13 @@ import { handleTextData } from './handle-text-data';
 import { hex } from './hex';
 import { render } from './render';
 import {
+	bytesProgress,
 	columnHeader,
 	headerItems,
 	headerOffsetSpacer,
-	progress,
+	headerProgress,
 	stat,
+	textProgress,
 	updateRowHeight,
 	updateScrollHandle,
 } from './state';
@@ -46,10 +48,12 @@ window.addEventListener('message', ({ data: message }) => {
 			return render();
 		}
 		case 'bytes': {
+			bytesProgress.style.visibility = 'hidden';
 			return handleByteData(message.data);
 		}
 		case 'text': {
-			progress.style.visibility = 'hidden';
+			headerProgress.style.visibility = 'hidden';
+			textProgress.style.visibility = 'hidden';
 			return handleTextData(message.data);
 		}
 	}

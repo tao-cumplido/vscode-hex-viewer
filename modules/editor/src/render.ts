@@ -1,7 +1,17 @@
 import { createElement } from './create-element';
 import { hex } from './hex';
-import { contentHeight, data, progress, resetData, rowHeight, scrollFactorY, stat, viewportHeight } from './state';
-import { gridColumn } from './style';
+import {
+	bytesProgress,
+	contentHeight,
+	data,
+	headerProgress,
+	resetData,
+	rowHeight,
+	scrollFactorY,
+	stat,
+	textProgress,
+	viewportHeight,
+} from './state';
 import { vscode } from './vscode';
 
 let debounceTimer = 0;
@@ -29,7 +39,6 @@ export function render(): void {
 		resetData();
 
 		const headerFragment = document.createDocumentFragment();
-		const placeholdersFragment = document.createDocumentFragment();
 
 		for (let rowIndex = renderStartIndex; rowIndex < renderEndIndex; rowIndex++) {
 			const cell = createElement('div', {
@@ -43,36 +52,16 @@ export function render(): void {
 			data.rows.set(rowIndex, { offset: cell, bytes: [], text: [] });
 
 			headerFragment.appendChild(cell);
-
-			for (let i = 0; stat.fileRows - 1 === rowIndex ? i < stat.fileSize % 0x10 : i < 0x10; i++) {
-				placeholdersFragment.appendChild(
-					createElement('div', {
-						style: {
-							'--row-index': `${rowIndex}`,
-							...gridColumn('byte', i),
-						},
-						content: createElement('div'),
-					}),
-				);
-				placeholdersFragment.appendChild(
-					createElement('div', {
-						style: {
-							'--row-index': `${rowIndex}`,
-							...gridColumn('text', i),
-						},
-						content: createElement('div'),
-					}),
-				);
-			}
 		}
 
 		data.header.appendChild(headerFragment);
-		data.placeholders.appendChild(placeholdersFragment);
 
 		clearTimeout(debounceTimer);
 
 		debounceTimer = setTimeout(() => {
-			progress.style.visibility = 'visible';
+			headerProgress.style.visibility = 'visible';
+			bytesProgress.style.visibility = 'visible';
+			textProgress.style.visibility = 'visible';
 			vscode.postMessage({ type: 'fetchBytes', data: { offset: renderStartOffset, byteLength: renderByteLength } });
 		}, 250);
 	}
