@@ -26,7 +26,7 @@ export function render(): void {
 		firstVisibleRow >= lastFirstRendered + maxVisibleRows ||
 		firstVisibleRow <= lastFirstRendered - maxVisibleRows
 	) {
-		const overscrollRows = 2 * maxVisibleRows;
+		const overscrollRows = Math.ceil(1.5 * maxVisibleRows);
 
 		const renderStartIndex = Math.max(0, firstVisibleRow - overscrollRows);
 		const renderEndIndex = Math.min(stat.fileRows, firstVisibleRow + maxVisibleRows + overscrollRows);
