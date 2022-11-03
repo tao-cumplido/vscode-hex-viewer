@@ -1,7 +1,7 @@
 export interface CreateElementData {
 	classList?: string[];
 	style?: Record<string, string>;
-	content?: string | Element | Element[];
+	content?: string | Node | Node[];
 }
 
 export function createElement<T extends keyof HTMLElementTagNameMap>(

@@ -1,7 +1,6 @@
 import { createElement } from './create-element';
 import { hex } from './hex';
 import {
-	bytesProgress,
 	contentHeight,
 	data,
 	headerProgress,
@@ -9,7 +8,6 @@ import {
 	rowHeight,
 	scrollFactorY,
 	stat,
-	textProgress,
 	viewportHeight,
 } from './state';
 import { vscode } from './vscode';
@@ -39,6 +37,7 @@ export function render(): void {
 		resetData();
 
 		const headerFragment = document.createDocumentFragment();
+		const placeholderFragment = document.createDocumentFragment();
 
 		for (let rowIndex = renderStartIndex; rowIndex < renderEndIndex; rowIndex++) {
 			const cell = createElement('div', {
@@ -49,19 +48,47 @@ export function render(): void {
 				content: hex(rowIndex * 0x10, stat.offsetHexDigitCount),
 			});
 
-			data.rows.set(rowIndex, { offset: cell, bytes: [], text: [] });
+			data.rows.set(rowIndex, { offset: cell, bytes: new Array<HTMLElement>(16), text: [] });
 
 			headerFragment.appendChild(cell);
+
+			const lineSpan = stat.fileRows - 1 === rowIndex ? stat.fileSize % 0x10 : 0x10;
+
+			placeholderFragment.appendChild(
+				createElement('div', {
+					classList: ['cell'],
+					style: {
+						'--row-index': `${rowIndex}`,
+						'grid-column': `byte 1 / span ${lineSpan}`,
+					},
+					content: createElement('div'),
+				}),
+			);
+
+			placeholderFragment.appendChild(
+				createElement('div', {
+					classList: ['cell'],
+					style: {
+						'--row-index': `${rowIndex}`,
+						'grid-column': `text 1 / span ${lineSpan}`,
+					},
+					content: createElement('div'),
+				}),
+			);
 		}
 
 		data.header.appendChild(headerFragment);
+		data.header.appendChild(
+			createElement('div', {
+				classList: ['placeholders'],
+				content: placeholderFragment,
+			}),
+		);
 
 		clearTimeout(debounceTimer);
 
 		debounceTimer = setTimeout(() => {
 			headerProgress.style.visibility = 'visible';
-			bytesProgress.style.visibility = 'visible';
-			textProgress.style.visibility = 'visible';
 			vscode.postMessage({ type: 'fetchBytes', data: { offset: renderStartOffset, byteLength: renderByteLength } });
 		}, 250);
 	}

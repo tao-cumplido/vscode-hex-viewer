@@ -4,7 +4,6 @@ import type { DataRow, HeaderItem } from './state';
 import { assert } from './assert';
 import { createElement } from './create-element';
 import { data, headerItems } from './state';
-import { gridColumn } from './style';
 import { throttle } from './throttle';
 
 const cleanup = throttle(() => {
@@ -22,7 +21,11 @@ function updateTextRelations(
 	byteCells: HTMLElement[],
 ) {
 	for (const cell of byteCells) {
-		const relations = assert.return(data.byteRelations.get(cell));
+		const relations = data.byteRelations.get(cell);
+
+		if (!relations) {
+			break;
+		}
 
 		for (const item of byteCells) {
 			if (item !== cell) {
@@ -141,10 +144,12 @@ export function handleTextData(result: null | DecoderResult): void {
 					classList: ['cell', value ? '' : 'empty'],
 					style: {
 						'--row-index': `${rowIndex}`,
-						...gridColumn('text', offset++),
+						'grid-column': `text ${columnIndex + 1} / span 1`,
 					},
 					content: value ?? '.',
 				});
+
+				offset++;
 
 				const byteCell = row.bytes[columnIndex];
 
@@ -167,7 +172,7 @@ export function handleTextData(result: null | DecoderResult): void {
 						style: {
 							...value.style,
 							'--row-index': `${rowIndex}`,
-							...gridColumn('text', offset, start),
+							'grid-column': `text ${columnIndex + 1} / span ${start}`,
 						},
 						content: value.text ?? '.',
 					});
@@ -180,7 +185,7 @@ export function handleTextData(result: null | DecoderResult): void {
 							classList: ['cell'],
 							style: {
 								'--row-index': `${i}`,
-								...gridColumn('text', 0, 0x10),
+								'grid-column': `text 1 / span ${0x10}`,
 							},
 						});
 
@@ -192,7 +197,7 @@ export function handleTextData(result: null | DecoderResult): void {
 						classList: ['cell'],
 						style: {
 							'--row-index': `${lastIndex}`,
-							...gridColumn('text', 0, end),
+							'grid-column': `text 1 / span ${end}`,
 						},
 					});
 
@@ -229,7 +234,7 @@ export function handleTextData(result: null | DecoderResult): void {
 						style: {
 							...value.style,
 							'--row-index': `${rowIndex}`,
-							...gridColumn('text', offset, length),
+							'grid-column': `text ${columnIndex + 1} / span ${length}`,
 						},
 						content: value.text ?? '.',
 					});

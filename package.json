@@ -34,6 +34,16 @@
 		}
 	},
 	"contributes": {
+		"colors": [
+			{
+				"id": "hexViewer.placeholder",
+				"description": "Color for placeholder rows while loading data.",
+				"defaults": {
+					"dark": "#ffffff10",
+					"light": "#00000010"
+				}
+			}
+		],
 		"configuration": {
 			"title": "Hex Viewer",
 			"properties": {

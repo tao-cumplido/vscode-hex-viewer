@@ -1,5 +1,4 @@
 import { createElement } from '../create-element';
-import { throttle } from '../throttle';
 import { viewport } from './dom';
 
 export interface DataRow {
@@ -39,14 +38,6 @@ export interface Data {
 // eslint-disable-next-line @typescript-eslint/init-declarations
 export let data!: Data;
 
-const cleanup = throttle(() => {
-	for (const element of viewport.querySelectorAll('.container')) {
-		if (element !== data.container) {
-			element.remove();
-		}
-	}
-}, 1000);
-
 export function resetData(): Data {
 	const header = createElement('header', {
 		classList: ['row'],
@@ -59,6 +50,13 @@ export function resetData(): Data {
 	const textSection = createElement('section', {
 		classList: ['text'],
 	});
+
+	for (const element of viewport.querySelectorAll('.container')) {
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		if (element !== data?.container) {
+			element.remove();
+		}
+	}
 
 	data = {
 		container: createElement('div', {
@@ -75,8 +73,6 @@ export function resetData(): Data {
 	};
 
 	viewport.appendChild(data.container);
-
-	cleanup();
 
 	return data;
 }

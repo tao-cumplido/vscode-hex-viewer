@@ -4,7 +4,6 @@ import { assert } from './assert';
 import { createElement } from './create-element';
 import { hex } from './hex';
 import { data, headerItems } from './state';
-import { gridColumn } from './style';
 import { vscode } from './vscode';
 
 export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): void {
@@ -36,12 +35,12 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 			classList: ['cell'],
 			style: {
 				'--row-index': `${rowIndex}`,
-				...gridColumn('byte', byteOffset),
+				'grid-column': `byte ${columnIndex + 1} / span 1`,
 			},
 			content: hex(byte),
 		});
 
-		row.bytes.push(cell);
+		row.bytes[columnIndex] = cell;
 		fragment.appendChild(cell);
 
 		const listener = new Map<string, () => unknown>();
@@ -96,7 +95,8 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 
 		data.byteRelations.set(cell, {
 			row: row.offset,
-			column: assert.return(headerItems[columnIndex]).byte,
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			column: headerItems[columnIndex]!.byte,
 			weak: [],
 			text: {
 				columns: [],
@@ -105,7 +105,7 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 		});
 	}
 
-	vscode.postMessage({ type: 'fetchText' });
-
 	data.bytesSection.appendChild(fragment);
+
+	vscode.postMessage({ type: 'fetchText' });
 }
