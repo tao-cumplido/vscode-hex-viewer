@@ -151,15 +151,19 @@ section > *,
 	contain: content;
 }
 
-.placeholders > .cell {
+.placeholders .cell {
 	z-index: var(--z-layer-section-progress);
 }
 
-.placeholders > .cell > div {
+.placeholders .skeleton {
 	width: 100%;
 	height: 50%;
 	background: var(--vscode-hexViewer-placeholder);
 	border-radius: var(--row-height);
+}
+
+.placeholders.hidden .skeleton {
+	display: none;
 }
 
 .offset {

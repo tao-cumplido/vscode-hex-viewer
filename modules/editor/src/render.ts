@@ -61,7 +61,9 @@ export function render(): void {
 						'--row-index': `${rowIndex}`,
 						'grid-column': `byte 1 / span ${lineSpan}`,
 					},
-					content: createElement('div'),
+					content: createElement('div', {
+						classList: ['skeleton'],
+					}),
 				}),
 			);
 
@@ -72,7 +74,9 @@ export function render(): void {
 						'--row-index': `${rowIndex}`,
 						'grid-column': `text 1 / span ${lineSpan}`,
 					},
-					content: createElement('div'),
+					content: createElement('div', {
+						classList: ['skeleton'],
+					}),
 				}),
 			);
 		}

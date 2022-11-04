@@ -3,7 +3,7 @@ import type { HostMessageMap } from '@hex/types';
 import { assert } from './assert';
 import { createElement } from './create-element';
 import { hex } from './hex';
-import { data, headerItems } from './state';
+import { data, headerItems, selectedOffsets } from './state';
 import { vscode } from './vscode';
 
 export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): void {
@@ -32,7 +32,7 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 		const columnIndex = byteOffset % 0x10;
 
 		const cell = createElement('div', {
-			classList: ['cell'],
+			classList: ['cell', selectedOffsets.has(byteOffset) ? 'selected' : ''],
 			style: {
 				'--row-index': `${rowIndex}`,
 				'grid-column': `byte ${columnIndex + 1} / span 1`,
@@ -73,6 +73,12 @@ export function handleByteData({ offset, buffer }: HostMessageMap['bytes']): voi
 			const relations = assert.return(byteRelations.get(cell));
 
 			cell.classList.toggle('selected');
+
+			if (cell.classList.contains('selected')) {
+				selectedOffsets.add(byteOffset);
+			} else {
+				selectedOffsets.delete(byteOffset);
+			}
 
 			for (const element of relations.text.unit) {
 				const textRelation = assert.return(textRelations.get(element));

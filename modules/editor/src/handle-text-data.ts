@@ -3,16 +3,9 @@ import type { DecoderResult } from '@hex/types';
 import type { DataRow, HeaderItem } from './state';
 import { assert } from './assert';
 import { createElement } from './create-element';
-import { data, headerItems } from './state';
-import { throttle } from './throttle';
+import { data, headerItems, selectedOffsets, viewport } from './state';
 
-const cleanup = throttle(() => {
-	for (const element of data.container.querySelectorAll('section.text')) {
-		if (element !== data.textSection) {
-			element.remove();
-		}
-	}
-}, 1000);
+const cellInfos = new WeakMap<HTMLElement, { offset: number; length: number }>();
 
 function updateTextRelations(
 	rows: DataRow[],
@@ -72,10 +65,19 @@ function updateTextRelations(
 		});
 
 		listener.set('mousedown', () => {
+			const { offset, length } = assert.return(cellInfos.get(cell));
 			const relations = assert.return(textRelations.get(cell));
 
 			for (const element of relations.text) {
 				element.classList.toggle('selected');
+			}
+
+			for (let i = offset; i < offset + length; i++) {
+				if (cell.classList.contains('selected')) {
+					selectedOffsets.add(i);
+				} else {
+					selectedOffsets.delete(i);
+				}
 			}
 
 			for (const element of relations.bytes) {
@@ -141,13 +143,15 @@ export function handleTextData(result: null | DecoderResult): void {
 
 			if (typeof value === 'string' || !value) {
 				const cell = createElement('div', {
-					classList: ['cell', value ? '' : 'empty'],
+					classList: ['cell', value ? '' : 'empty', selectedOffsets.has(offset) ? 'selected' : ''],
 					style: {
 						'--row-index': `${rowIndex}`,
 						'grid-column': `text ${columnIndex + 1} / span 1`,
 					},
 					content: value ?? '.',
 				});
+
+				cellInfos.set(cell, { offset, length: 1 });
 
 				offset++;
 
@@ -158,6 +162,7 @@ export function handleTextData(result: null | DecoderResult): void {
 				fragment.appendChild(cell);
 			} else {
 				const length = value.length ?? 1;
+				const selected = selectedOffsets.hasRange(offset, length) ? 'selected' : '';
 
 				if (columnIndex + length > 0x10) {
 					const start = (-columnIndex + 0x10) % 0x10;
@@ -168,7 +173,7 @@ export function handleTextData(result: null | DecoderResult): void {
 					const textCells: HTMLElement[] = [];
 
 					let cell = createElement('div', {
-						classList: ['cell', value.text ? '' : 'empty'],
+						classList: ['cell', value.text ? '' : 'empty', selected],
 						style: {
 							...value.style,
 							'--row-index': `${rowIndex}`,
@@ -177,29 +182,35 @@ export function handleTextData(result: null | DecoderResult): void {
 						content: value.text ?? '.',
 					});
 
+					cellInfos.set(cell, { offset, length });
+
 					textCells.push(cell);
 					fragment.appendChild(cell);
 
 					for (let i = rowIndex + 1; i < lastIndex; i++) {
 						cell = createElement('div', {
-							classList: ['cell'],
+							classList: ['cell', selected],
 							style: {
 								'--row-index': `${i}`,
 								'grid-column': `text 1 / span ${0x10}`,
 							},
 						});
 
+						cellInfos.set(cell, { offset, length });
+
 						textCells.push(cell);
 						fragment.appendChild(cell);
 					}
 
 					cell = createElement('div', {
-						classList: ['cell'],
+						classList: ['cell', selected],
 						style: {
 							'--row-index': `${lastIndex}`,
 							'grid-column': `text 1 / span ${end}`,
 						},
 					});
+
+					cellInfos.set(cell, { offset, length });
 
 					textCells.push(cell);
 					fragment.appendChild(cell);
@@ -230,7 +241,7 @@ export function handleTextData(result: null | DecoderResult): void {
 					updateTextRelations(rows, headerCells, textCells, byteCells);
 				} else {
 					const cell = createElement('div', {
-						classList: ['cell', value.text ? '' : 'empty'],
+						classList: ['cell', value.text ? '' : 'empty', selected],
 						style: {
 							...value.style,
 							'--row-index': `${rowIndex}`,
@@ -238,6 +249,8 @@ export function handleTextData(result: null | DecoderResult): void {
 						},
 						content: value.text ?? '.',
 					});
+
+					cellInfos.set(cell, { offset, length });
 
 					const byteCells = row.bytes.slice(columnIndex, columnIndex + length);
 					const headerCells = headerItems.slice(columnIndex, columnIndex + length);
@@ -261,5 +274,19 @@ export function handleTextData(result: null | DecoderResult): void {
 
 	data.container.appendChild(data.textSection);
 
-	cleanup();
+	for (const element of data.header.querySelectorAll('.placeholders')) {
+		element.classList.add('hidden');
+	}
+
+	for (const element of data.container.querySelectorAll('section.text')) {
+		if (element !== data.textSection) {
+			element.remove();
+		}
+	}
+
+	for (const element of viewport.querySelectorAll('.container')) {
+		if (element !== data.container) {
+			element.remove();
+		}
+	}
 }
