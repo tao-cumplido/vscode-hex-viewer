@@ -10,6 +10,7 @@ import { hex } from './hex';
 import { render } from './render';
 import {
 	columnHeader,
+	data,
 	headerItems,
 	headerOffsetSpacer,
 	headerProgress,
@@ -47,6 +48,19 @@ window.addEventListener('message', ({ data: message }) => {
 		}
 		case 'bytes': {
 			return handleByteData(message.data);
+		}
+		case 'prepareText': {
+			headerProgress.style.visibility = 'visible';
+
+			for (const element of data.header.querySelectorAll('.placeholders')) {
+				element.classList.remove('hidden');
+			}
+
+			for (const element of data.container.querySelectorAll('section.text')) {
+				element.remove();
+			}
+
+			return;
 		}
 		case 'text': {
 			headerProgress.style.visibility = 'hidden';

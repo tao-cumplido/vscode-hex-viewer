@@ -56,6 +56,14 @@ export class ViewState {
 		});
 	}
 
+	async prepareText(): Promise<void> {
+		await this.webview.postMessage({
+			type: 'prepareText',
+		});
+
+		await this.handleFetchText();
+	}
+
 	async handleFetchText(): Promise<void> {
 		await this.webview.postMessage({
 			type: 'text',

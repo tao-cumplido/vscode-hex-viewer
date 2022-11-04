@@ -57,6 +57,7 @@ declare namespace module {
 			offset: number;
 			buffer: ArrayBuffer;
 		};
+		prepareText: undefined;
 		text: DecoderResult | null;
 	}
 
