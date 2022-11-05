@@ -70,4 +70,11 @@ export class ViewState {
 			data: await this.document.decodeWith(this.decoderItem.decoder, this.offset, this.buffer),
 		});
 	}
+
+	async goToOffset(offset: number): Promise<void> {
+		await this.webview.postMessage({
+			type: 'goTo',
+			data: offset,
+		});
+	}
 }

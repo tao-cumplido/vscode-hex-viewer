@@ -59,6 +59,7 @@ declare namespace module {
 		};
 		prepareText: undefined;
 		text: DecoderResult | null;
+		goTo: number;
 	}
 
 	export type HostMessage = Messages<HostMessageMap>;

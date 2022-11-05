@@ -115,6 +115,10 @@
 			{
 				"command": "hexViewer.reloadDecoders",
 				"title": "Hex Viewer: Reload decoders"
+			},
+			{
+				"command": "hexViewer.goToOffset",
+				"title": "Hex Viewer: Go to offset..."
 			}
 		],
 		"menus": {
@@ -125,6 +129,10 @@
 				},
 				{
 					"command": "hexViewer.reloadDecoders"
+				},
+				{
+					"command": "hexViewer.goToOffset",
+					"when": "hexViewer:openEditor"
 				}
 			]
 		}

@@ -1,5 +1,5 @@
 import type { ExtensionContext } from 'vscode';
-import { commands, window, workspace, QuickPickItemKind, StatusBarAlignment } from 'vscode';
+import { commands, window, workspace, InputBoxValidationSeverity, QuickPickItemKind, StatusBarAlignment } from 'vscode';
 
 import { BinaryViewProvider } from './binary-view-provider';
 import { resolveCustomDecoders } from './custom-decoders';
@@ -68,6 +68,43 @@ export function activate(context: ExtensionContext): void {
 	);
 
 	context.subscriptions.push(commands.registerCommand('hexViewer.reloadDecoders', reloadDecoders));
+
+	context.subscriptions.push(
+		commands.registerCommand('hexViewer.goToOffset', async () => {
+			const input = await window.showInputBox({
+				title: 'Go to offset',
+				prompt: 'Enter an offset in hexadecimal notation.',
+				// eslint-disable-next-line @typescript-eslint/no-shadow
+				validateInput: (input) => {
+					const value = parseInt(input, 16);
+
+					if (Number.isNaN(value) || !/^[0-9a-f]+$/iu.test(input)) {
+						return {
+							severity: InputBoxValidationSeverity.Error,
+							message: 'Invalid input',
+						};
+					}
+
+					const size = state.activeView?.document.byteLength ?? 0;
+
+					if (value >= size) {
+						return {
+							severity: InputBoxValidationSeverity.Warning,
+							message: 'Input exceeds file size',
+						};
+					}
+
+					return null;
+				},
+			});
+
+			if (!input) {
+				return;
+			}
+
+			await state.activeView?.goToOffset(parseInt(input, 16));
+		}),
+	);
 
 	context.subscriptions.push(BinaryViewProvider.register(context));
 }

@@ -11,6 +11,7 @@ import { render } from './render';
 import {
 	columnHeader,
 	data,
+	goToOffset,
 	headerItems,
 	headerOffsetSpacer,
 	headerProgress,
@@ -65,6 +66,9 @@ window.addEventListener('message', ({ data: message }) => {
 		case 'text': {
 			headerProgress.style.visibility = 'hidden';
 			return handleTextData(message.data);
+		}
+		case 'goTo': {
+			return goToOffset(message.data);
 		}
 	}
 });

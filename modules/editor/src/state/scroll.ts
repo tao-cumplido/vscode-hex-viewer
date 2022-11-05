@@ -52,6 +52,14 @@ function scrollY(top: number): void {
 	window.dispatchEvent(new CustomEvent('content-scroll'));
 }
 
+export function goToOffset(offset: number): void {
+	const rowIndex = Math.floor(offset / 0x10);
+	const factor = (rowHeight * rowIndex) / contentHeight;
+	const topMax = viewportHeight - yHandleHeight;
+	const top = (factor * topMax * viewportHeight) / (yHandleHeight - yHandleReal + topMax);
+	scrollY(top);
+}
+
 export function updateScrollHandle(entries?: readonly ResizeObserverEntry[]): void {
 	viewportHeight = entries?.[0]?.contentRect.height ?? scrollBarY.getBoundingClientRect().height;
 	contentHeight = (stat.fileRows + 1) * rowHeight;
