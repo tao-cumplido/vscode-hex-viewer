@@ -7,7 +7,7 @@
 		"build": "ts-node build.ts"
 	},
 	"devDependencies": {
-		"ajv": "8.8.2",
-		"ts-node": "10.4.0"
+		"ajv": "8.11.0",
+		"ts-node": "10.9.1"
 	}
 }

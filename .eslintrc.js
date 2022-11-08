@@ -271,6 +271,10 @@ module.exports = {
 						format: ['strictCamelCase'],
 						leadingUnderscore: 'allow',
 					},
+					{
+						selector: 'objectLiteralProperty',
+						format: null,
+					},
 				],
 				'@typescript-eslint/no-empty-interface': 'error',
 				'@typescript-eslint/no-explicit-any': 'error',
