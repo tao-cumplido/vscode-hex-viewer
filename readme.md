@@ -1,3 +1,7 @@
+> [!Important]
+> The extension was rebranded and the repository moved to https://github.com/tao-cumplido/inspector-hex.
+
+
 # Hex Viewer
 
 Custom editor extension to open files in raw byte representation. Also renders possible text decoding results. Doesn't support editing the document (yet).
